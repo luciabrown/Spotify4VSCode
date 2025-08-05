@@ -9,3 +9,10 @@ go run .
 npm install node-fetch
 npm install -g yo generator-code
 yo code
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!
+go run .
+npm run compile
+code .
+!!!!!!!!!!!!!!!!!!!!!!!!!
