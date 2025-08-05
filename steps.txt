@@ -1,0 +1,5 @@
+Install go
+CD into project
+go mod init vscode
+go get github.com/joho/godotenv
+go run main.go
