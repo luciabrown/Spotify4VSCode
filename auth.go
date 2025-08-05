@@ -61,3 +61,22 @@ func handleCallback(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Authentication successful.")
 	log.Println("Authentication complete, token saved.")
 }
+
+func getClient() (*http.Client, error) {
+	token, err := loadToken()
+	if err != nil {
+		return nil, fmt.Errorf("failed to load token: %w", err)
+	}
+
+	tokenSource := oauthConfig.TokenSource(context.Background(), token)
+	newToken, err := tokenSource.Token()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get token: %w", err)
+	}
+
+	// Save refreshed token if changed
+	if newToken.AccessToken != token.AccessToken {
+		saveToken(newToken)
+	}
+	return oauth2.NewClient(context.Background(), tokenSource), nil
+}
