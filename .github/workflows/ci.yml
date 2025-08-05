@@ -1,8 +1,22 @@
-- name: Check secret presence
-  run: |
-    if [ -z "${{ secrets.CLIENT_SECRET }}" ]; then
-      echo "Secret is missing!"
-      exit 1
-    else
-      echo "Secret is set."
-    fi
+name: CI Workflow  # optional workflow name
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Check CLIENT_SECRET
+        run: |
+          if [ -z "${{ secrets.CLIENT_SECRET }}" ]; then
+            echo "CLIENT_SECRET is not set. Failing the job."
+            exit 1
+          else
+            echo "CLIENT_SECRET is set."
+          fi
