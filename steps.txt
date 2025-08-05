@@ -3,3 +3,6 @@ CD into project
 go mod init vscode
 go get github.com/joho/godotenv
 go run main.go
+
+go get golang.org/x/oauth2
+go get golang.org/x/oauth2/spotify
