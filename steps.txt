@@ -5,3 +5,5 @@ go get github.com/joho/godotenv
 go get golang.org/x/oauth2
 go get golang.org/x/oauth2/spotify
 go run .
+
+npm install node-fetch
