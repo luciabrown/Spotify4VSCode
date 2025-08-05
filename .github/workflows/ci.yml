@@ -1,9 +1,8 @@
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Use secret
-        run: echo "My secret is ${{ secrets.CLIENT_SECRET }}"
+- name: Check secret presence
+  run: |
+    if [ -z "${{ secrets.CLIENT_SECRET }}" ]; then
+      echo "Secret is missing!"
+      exit 1
+    else
+      echo "Secret is set."
+    fi
