@@ -29,8 +29,8 @@ func main() {
 		fmt.Fprintf(w, "backend running")
 	})
 
-	http.HandleFunc("/callback", handleCallback)
-	http.HandleFunc("/nowplaying", nowPlayingHandler) // Start the handler
+	http.HandleFunc("/callback", handlers.handleCallback)
+	http.HandleFunc("/nowplaying", handlers.nowPlayingHandler) // Start the handler
 
 	// Log notes
 	log.Println("Starting server on :12345")
