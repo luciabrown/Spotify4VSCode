@@ -119,5 +119,14 @@ func nowPlayingHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(simplified)
+
+	// Pretty print support
+	prettyJSON, err := json.MarshalIndent(simplified, "", "  ")
+	if err != nil {
+		http.Error(w, "Failed to format JSON: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Write(prettyJSON)
+
 }
