@@ -28,6 +28,7 @@ type Item struct {
 	Name         string       `json:"name"`
 	Artists      []Artist     `json:"artists"`
 	Album        Album        `json:"album"`
+	URI          string       `json:"uri"`
 	ExternalURLs ExternalURLs `json:"external_urls"`
 }
 
@@ -36,7 +37,10 @@ type NowPlaying struct {
 	Item      Item `json:"item"`
 }
 
+var lastKnownTrackURI string // ID of last known track in the session
+
 func NowPlayingHandler(w http.ResponseWriter, r *http.Request) {
+
 	client, err := getClient()
 	if err != nil {
 		http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
@@ -73,6 +77,8 @@ func NowPlayingHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Make note of last track played, if it exists
+	lastKnownTrackURI = raw.Item.URI
 	// Join artist names
 	artists := ""
 	for i, artist := range raw.Item.Artists {

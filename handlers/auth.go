@@ -20,7 +20,7 @@ func SetOAuthConfig(clientID, clientSecret, redirectURI string) {
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		RedirectURL:  redirectURI,
-		Scopes:       []string{"user-read-playback-state"},
+		Scopes:       []string{"user-read-playback-state", "user-modify-playback-state", "user-read-currently-playing"},
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  "https://accounts.spotify.com/authorize",
 			TokenURL: "https://accounts.spotify.com/api/token",

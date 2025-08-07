@@ -37,6 +37,8 @@ func main() {
 	//http.HandleFunc("/coverart", handlers.CoverArtHandler)     // Get cover art
 
 	// Log notes
+	http.HandleFunc("/pause", handlers.PauseHandler)
+	http.HandleFunc("/play", handlers.PauseHandler)
 	log.Println("Starting server on :12345")
 	log.Fatal(http.ListenAndServe(":12345", nil))
 }

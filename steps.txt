@@ -16,3 +16,5 @@ go run .
 npm run compile
 code .
 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+If the pause/play functionality does not work, delete token.json and run the application again
