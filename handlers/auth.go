@@ -11,7 +11,7 @@ import (
 
 var (
 	oauthConfig *oauth2.Config
-	stateString = "randomstatestring"
+	StateString = "randomstatestring"
 	tokenFile   = "token.json"
 )
 
@@ -30,7 +30,7 @@ func SetOAuthConfig(clientID, clientSecret, redirectURI string) {
 
 // If token not saved, print URL
 func StartAuthFlow() {
-	if _, err := loadToken(); err == nil {
+	if _, err := LoadToken(); err == nil {
 		log.Println("Token found, skipping authentication")
 		return
 	}
@@ -52,7 +52,7 @@ func HandleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = saveToken(token)
+	err = SaveToken(token)
 	if err != nil {
 		http.Error(w, "Failed to save token: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -63,7 +63,7 @@ func HandleCallback(w http.ResponseWriter, r *http.Request) {
 }
 
 func getClient() (*http.Client, error) {
-	token, err := loadToken()
+	token, err := LoadToken()
 	if err != nil {
 		return nil, fmt.Errorf("failed to load token: %w", err)
 	}
@@ -76,7 +76,7 @@ func getClient() (*http.Client, error) {
 
 	// Save refreshed token if changed
 	if newToken.AccessToken != token.AccessToken {
-		saveToken(newToken)
+		SaveToken(newToken)
 	}
 	return oauth2.NewClient(context.Background(), tokenSource), nil
 }

@@ -28,3 +28,9 @@ func loadToken() (*oauth2.Token, error) {
 	err = json.NewDecoder(f).Decode(&token)
 	return &token, err
 }
+
+// Exported wrappers for testing
+var (
+	LoadToken = loadToken
+	SaveToken = saveToken
+)
