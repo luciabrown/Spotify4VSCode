@@ -29,7 +29,7 @@ func SetOAuthConfig(clientID, clientSecret, redirectURI string) {
 }
 
 // If token not saved, print URL
-func startAuthFlow() {
+func StartAuthFlow() {
 	if _, err := loadToken(); err == nil {
 		log.Println("Token found, skipping authentication")
 		return
@@ -40,7 +40,7 @@ func startAuthFlow() {
 }
 
 // HTTP handler
-func handleCallback(w http.ResponseWriter, r *http.Request) {
+func HandleCallback(w http.ResponseWriter, r *http.Request) {
 	if r.FormValue("state") != stateString {
 		http.Error(w, "State mismatch", http.StatusBadRequest)
 		return

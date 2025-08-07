@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func nowPlayingHandler(w http.ResponseWriter, r *http.Request) {
+func NowPlayingHandler(w http.ResponseWriter, r *http.Request) {
 	client, err := getClient()
 	if err != nil {
 		http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)

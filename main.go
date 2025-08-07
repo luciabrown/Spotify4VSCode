@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 
+	"vscode/handlers"
+
 	"github.com/joho/godotenv"
 )
 
@@ -21,16 +23,16 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	SetOAuthConfig(clientID, clientSecret, redirectURI)
-	go startAuthFlow()
+	handlers.SetOAuthConfig(clientID, clientSecret, redirectURI)
+	go handlers.StartAuthFlow()
 
 	//Success
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "backend running")
 	})
 
-	http.HandleFunc("/callback", handlers.handleCallback)
-	http.HandleFunc("/nowplaying", handlers.nowPlayingHandler) // Start the handler
+	http.HandleFunc("/callback", handlers.HandleCallback)
+	http.HandleFunc("/nowplaying", handlers.NowPlayingHandler) // Start the handler
 
 	// Log notes
 	log.Println("Starting server on :12345")
