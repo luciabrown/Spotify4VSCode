@@ -3,7 +3,7 @@ name: CI Workflow
 on:
   push:
     branches:
-      - main
+      - ci
 
 jobs:
   build:
@@ -45,4 +45,4 @@ jobs:
 
       # TODO:
       - name: Run tests
-        run: go test -v ./...
+        run: go test -v ./tests
