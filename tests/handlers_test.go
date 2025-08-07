@@ -30,6 +30,11 @@ func TestNowPlayingHandler(t *testing.T) {
 
 func TestHandleCallback_Success(t *testing.T) {
 	// Backup original functions
+	handlers.SetOAuthConfig(
+		"dummy-client-id",
+		"dummy-client-secret",
+		"http://localhost/callback",
+	)
 	origLoadToken := handlers.LoadToken
 	origSaveToken := handlers.SaveToken
 	defer func() {
