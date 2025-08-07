@@ -34,14 +34,14 @@ func StartAuthFlow() {
 		log.Println("Token found, skipping authentication")
 		return
 	}
-	url := oauthConfig.AuthCodeURL(stateString, oauth2.AccessTypeOffline)
+	url := oauthConfig.AuthCodeURL(StateString, oauth2.AccessTypeOffline)
 	fmt.Println("Open this URL in your browser")
 	fmt.Println(url)
 }
 
 // HTTP handler
 func HandleCallback(w http.ResponseWriter, r *http.Request) {
-	if r.FormValue("state") != stateString {
+	if r.FormValue("state") != StateString {
 		http.Error(w, "State mismatch", http.StatusBadRequest)
 		return
 	}
