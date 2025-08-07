@@ -32,7 +32,8 @@ func main() {
 	})
 
 	http.HandleFunc("/callback", handlers.HandleCallback)
-	http.HandleFunc("/nowplaying", handlers.NowPlayingHandler) // Start the handler
+	http.HandleFunc("/nowplaying", handlers.NowPlayingHandler) // Start the handler to find song
+	//http.HandleFunc("/coverart", handlers.CoverArtHandler)     // Get cover art
 
 	// Log notes
 	log.Println("Starting server on :12345")

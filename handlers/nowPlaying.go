@@ -4,7 +4,37 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"vscode/cache"
 )
+
+type Artist struct {
+	Name string `json:"name"`
+}
+
+type AlbumImage struct {
+	URL string `json:"url"`
+}
+
+type Album struct {
+	Name   string       `json:"name"`
+	Images []AlbumImage `json:"images"`
+}
+
+type ExternalURLs struct {
+	Spotify string `json:"spotify"`
+}
+
+type Item struct {
+	Name         string       `json:"name"`
+	Artists      []Artist     `json:"artists"`
+	Album        Album        `json:"album"`
+	ExternalURLs ExternalURLs `json:"external_urls"`
+}
+
+type NowPlaying struct {
+	IsPlaying bool `json:"is_playing"`
+	Item      Item `json:"item"`
+}
 
 func NowPlayingHandler(w http.ResponseWriter, r *http.Request) {
 	client, err := getClient()
@@ -21,40 +51,29 @@ func NowPlayingHandler(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 204 {
+		// No song playing
+		empty := map[string]interface{}{
+			"playing": false,
+		}
+		emptyJSON, _ := json.MarshalIndent(empty, "", "  ")
+		cache.SaveImageURL("")
+		cache.SaveJSON(emptyJSON)
 		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`{"status": "Nothing is playing"}`))
+		w.Write(emptyJSON)
 		return
 	} else if resp.StatusCode != 200 {
 		http.Error(w, "Spotify API error: "+resp.Status, resp.StatusCode)
 		return
 	}
 
-	var raw struct {
-		IsPlaying bool `json:"is_playing"`
-		Item      struct {
-			Name  string `json:"name"`
-			Album struct {
-				Name   string `json:"name"`
-				Images []struct {
-					URL string `json:"url"`
-				} `json:"images"`
-			} `json:"album"`
-			Artists []struct {
-				Name string `json:"name"`
-			} `json:"artists"`
-			ExternalURLs struct {
-				Spotify string `json:"spotify"`
-			} `json:"external_urls"`
-		} `json:"item"`
-	}
-
+	var raw NowPlaying
 	err = json.NewDecoder(resp.Body).Decode(&raw)
 	if err != nil {
-		http.Error(w, "Failed to decode response: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Failed to parse JSON: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Extract info
+	// Join artist names
 	artists := ""
 	for i, artist := range raw.Item.Artists {
 		if i > 0 {
@@ -63,12 +82,13 @@ func NowPlayingHandler(w http.ResponseWriter, r *http.Request) {
 		artists += artist.Name
 	}
 
+	// Get cover art URL (largest image)
 	albumArt := ""
 	if len(raw.Item.Album.Images) > 0 {
 		albumArt = raw.Item.Album.Images[0].URL
 	}
 
-	// Create simplified response
+	// Build simplified response
 	simplified := map[string]interface{}{
 		"status": func() string {
 			if raw.IsPlaying {
@@ -85,13 +105,16 @@ func NowPlayingHandler(w http.ResponseWriter, r *http.Request) {
 		"description":   fmt.Sprintf("🎵 Now playing: '%s' by %s", raw.Item.Name, artists),
 	}
 
-	// Pretty-print JSON output
-	w.Header().Set("Content-Type", "application/json")
 	prettyJSON, err := json.MarshalIndent(simplified, "", "  ")
 	if err != nil {
-		http.Error(w, "Failed to format JSON: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Failed to marshal JSON: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	// Cache the cover art URL and simplified JSON
+	cache.SaveImageURL(albumArt)
+	cache.SaveJSON(prettyJSON)
+
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(prettyJSON)
 }
