@@ -25,6 +25,7 @@ func main() {
 
 	handlers.SetOAuthConfig(clientID, clientSecret, redirectURI)
 	go handlers.StartAuthFlow()
+	go handlers.PollNowPlaying()
 
 	//Success
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
