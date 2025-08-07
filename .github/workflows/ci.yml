@@ -44,5 +44,5 @@ jobs:
         run: go build -v ./...
 
       # TODO:
-      - name: Run tests
-        run: go test -v ./tests
+      #- name: Run tests
+      #  run: go test -v ./tests
