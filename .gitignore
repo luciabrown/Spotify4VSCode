@@ -1,3 +1,4 @@
 .env
 node_modules
-luciabrown
+luciabrown/node_modules
+luciabrown/dist

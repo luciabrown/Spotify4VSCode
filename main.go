@@ -38,7 +38,7 @@ func main() {
 
 	// Log notes
 	http.HandleFunc("/pause", handlers.PauseHandler)
-	http.HandleFunc("/play", handlers.PauseHandler)
+	http.HandleFunc("/play", handlers.PlayHandler)
 	log.Println("Starting server on :12345")
 	log.Fatal(http.ListenAndServe(":12345", nil))
 }
