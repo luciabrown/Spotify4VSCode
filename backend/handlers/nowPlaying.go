@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"vscode/cache"
+	"vscode/backend/cache"
 )
 
 type Artist struct {

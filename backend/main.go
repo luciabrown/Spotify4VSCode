@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"vscode/handlers"
+	"vscode/backend/handlers"
 
 	"github.com/joho/godotenv"
 )
