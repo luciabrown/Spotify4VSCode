@@ -14,7 +14,7 @@ export function activate(context: vscode.ExtensionContext) {
 	//vscode.window.showInformationMessage('Spotify extension is activated!');
   	//console.log('Spotify extension is activated!');
 
-	const disposable = vscode.commands.registerCommand('luciabrown.helloWorld', () => {
+	const disposable = vscode.commands.registerCommand('frontend.helloWorld', () => {
 		vscode.window.showInformationMessage('Hello World from SpotifyNowListening!');
 	});
 	context.subscriptions.push(disposable);

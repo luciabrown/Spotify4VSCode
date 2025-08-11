@@ -1,5 +1,5 @@
 {
-  "name": "luciabrown",
+  "name": "frontend",
   "displayName": "SpotifyNowListening",
   "description": "An extension to see Now Listening on Spotify",
   "version": "0.0.1",
@@ -16,7 +16,7 @@
   "contributes": {
     "commands": [
       {
-        "command": "luciabrown.iAmTesting",
+        "command": "frontend.iAmTesting",
         "title": "This is a Test"
       }
     ]
