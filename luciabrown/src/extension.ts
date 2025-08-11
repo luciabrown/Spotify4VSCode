@@ -11,8 +11,8 @@ interface SpotifyNowPlaying {
 }
 
 export function activate(context: vscode.ExtensionContext) {
-	vscode.window.showInformationMessage('Spotify extension is activated!');
-  	console.log('Spotify extension is activated!');
+	//vscode.window.showInformationMessage('Spotify extension is activated!');
+  	//console.log('Spotify extension is activated!');
 
 	const disposable = vscode.commands.registerCommand('luciabrown.helloWorld', () => {
 		vscode.window.showInformationMessage('Hello World from SpotifyNowListening!');
@@ -49,6 +49,4 @@ export function activate(context: vscode.ExtensionContext) {
 	updateSpotifyStatus();
 	setInterval(updateSpotifyStatus, 15000);
 }
-
-
 export function deactivate() {}
