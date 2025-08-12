@@ -20,7 +20,10 @@ code .
 If the pause/play functionality does not work, delete token.json and run the application again
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Use baked-in .env (CI secrets):
 docker run --name project-backend -p 12345:12345 luciafbrown/project-backend:latest
+
 or
+Use local .env file at runtime
 docker run --name project-backend -p 12345:12345 --env-file ./backend/.env luciafbrown/project-backend:latest
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
