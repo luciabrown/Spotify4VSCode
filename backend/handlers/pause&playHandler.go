@@ -48,34 +48,67 @@ func PlayHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Play last known track or fallback
-	trackToPlay := lastKnownTrackURI
-	if trackToPlay == "" {
-		trackToPlay = fallbackTrackURI
-	}
-
-	body := map[string]interface{}{
-		"uris": []string{trackToPlay},
-	}
-	jsonBody, _ := json.Marshal(body)
-
-	req, err := http.NewRequest(http.MethodPut, "https://api.spotify.com/v1/me/player/play", bytes.NewReader(jsonBody))
+	// Get current playback state to find where you left off in the song
+	playbackReq, err := http.NewRequest(http.MethodGet, "https://api.spotify.com/v1/me/player", nil)
 	if err != nil {
-		http.Error(w, "Failed to create request: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Failed to create playback state request: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := client.Do(req)
+	resp, err := client.Do(playbackReq)
 	if err != nil {
-		http.Error(w, "Failed to play track: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Failed to get current playback: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == http.StatusNoContent {
-		fmt.Fprintln(w, "Playback started.")
+	if resp.StatusCode != http.StatusOK {
+		http.Error(w, "Failed to get playback state, status: "+resp.Status, resp.StatusCode)
+		return
+	}
+
+	var playbackState struct {
+		IsPlaying  bool `json:"is_playing"`
+		ProgressMs int  `json:"progress_ms"`
+		Item       struct {
+			URI string `json:"uri"`
+		} `json:"item"`
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&playbackState)
+	if err != nil {
+		http.Error(w, "Failed to parse playback state: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	trackToPlay := playbackState.Item.URI
+	if trackToPlay == "" {
+		// fallback if no current track
+		trackToPlay = fallbackTrackURI
+	}
+
+	body := map[string]interface{}{
+		"uris":        []string{trackToPlay},
+		"position_ms": playbackState.ProgressMs,
+	}
+	jsonBody, _ := json.Marshal(body)
+
+	playReq, err := http.NewRequest(http.MethodPut, "https://api.spotify.com/v1/me/player/play", bytes.NewReader(jsonBody))
+	if err != nil {
+		http.Error(w, "Failed to create play request: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	playReq.Header.Set("Content-Type", "application/json")
+
+	playResp, err := client.Do(playReq)
+	if err != nil {
+		http.Error(w, "Failed to play track: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer playResp.Body.Close()
+
+	if playResp.StatusCode == http.StatusNoContent {
+		fmt.Fprintln(w, "Playback resumed.")
 	} else {
-		http.Error(w, "Status: "+resp.Status, resp.StatusCode)
+		http.Error(w, "Status: "+playResp.Status, playResp.StatusCode)
 	}
 }

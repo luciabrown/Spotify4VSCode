@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"vscode/handlers"
+	"vscode/backend/handlers"
 
 	"golang.org/x/oauth2"
 )
