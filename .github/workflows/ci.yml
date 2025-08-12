@@ -38,3 +38,7 @@ jobs:
           file: docker/Dockerfile
           push: true
           tags: luciafbrown/project-backend:latest
+          build-args: |
+            CLIENT_ID=${{ secrets.CLIENT_ID }}
+            CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}
+            REDIRECT_URI=${{ secrets.REDIRECT_URI }}

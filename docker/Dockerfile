@@ -16,11 +16,19 @@ FROM alpine:latest
 
 WORKDIR /app
 
-COPY --from=builder /app/project-backend ./project-backend
-#get env
-COPY backend/.env ./.env
- 
+ARG CLIENT_ID
+ARG CLIENT_SECRET
+ARG REDIRECT_URI
 
+COPY --from=builder /app/project-backend ./project-backend
+
+# GET INTO FROM .ENV
+RUN echo "CLIENT_ID=$CLIENT_ID" > .env \
+ && echo "CLIENT_SECRET=$CLIENT_SECRET" >> .env \
+ && echo "REDIRECT_URI=$REDIRECT_URI" >> .env
+
+COPY --from=builder /app/project-backend ./project-backend
+ 
 # Expose the port
 EXPOSE 12345
 
