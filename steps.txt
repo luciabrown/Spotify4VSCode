@@ -27,3 +27,5 @@ or
 Use local .env file at runtime
 docker run --name project-backend -p 12345:12345 --env-file ./backend/.env luciafbrown/project-backend:latest
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+docker start project-backend

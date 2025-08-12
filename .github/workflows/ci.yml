@@ -3,7 +3,7 @@ name: CI Workflow
 on:
   push:
     branches:
-      - main
+      - docker-validation
 
 jobs:
   docker:
@@ -37,7 +37,9 @@ jobs:
           context: .
           file: docker/Dockerfile
           push: true
-          tags: luciafbrown/project-backend:latest
+          tags: |
+            luciafbrown/project-backend:latest
+            luciafbrown/project-backend:${{ github.sha }}
           build-args: |
             CLIENT_ID=${{ secrets.CLIENT_ID }}
             CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}
