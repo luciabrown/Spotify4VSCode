@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -48,12 +49,13 @@ func PlayHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get current playback state to find where you left off in the song
+	// Get current playback state
 	playbackReq, err := http.NewRequest(http.MethodGet, "https://api.spotify.com/v1/me/player", nil)
 	if err != nil {
-		http.Error(w, "Failed to create playback state request: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Failed to create playback request: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	resp, err := client.Do(playbackReq)
 	if err != nil {
 		http.Error(w, "Failed to get current playback: "+err.Error(), http.StatusInternalServerError)
@@ -62,15 +64,19 @@ func PlayHandler(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		http.Error(w, "Failed to get playback state, status: "+resp.Status, resp.StatusCode)
+		http.Error(w, "Failed to get playback state: "+resp.Status, resp.StatusCode)
 		return
 	}
 
 	var playbackState struct {
+		Device struct {
+			ID string `json:"id"`
+		} `json:"device"`
 		IsPlaying  bool `json:"is_playing"`
 		ProgressMs int  `json:"progress_ms"`
 		Item       struct {
-			URI string `json:"uri"`
+			URI      string `json:"uri"`
+			Duration int    `json:"duration_ms"`
 		} `json:"item"`
 	}
 
@@ -80,15 +86,25 @@ func PlayHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if playbackState.Device.ID == "" {
+		http.Error(w, "No active device found. Please open Spotify on a device and try again.", http.StatusBadRequest)
+		return
+	}
+
 	trackToPlay := playbackState.Item.URI
 	if trackToPlay == "" {
-		// fallback if no current track
 		trackToPlay = fallbackTrackURI
+	}
+
+	// Ensure position_ms is within the track duration, else reset to 0
+	pos := playbackState.ProgressMs
+	if pos >= playbackState.Item.Duration {
+		pos = 0
 	}
 
 	body := map[string]interface{}{
 		"uris":        []string{trackToPlay},
-		"position_ms": playbackState.ProgressMs,
+		"position_ms": pos,
 	}
 	jsonBody, _ := json.Marshal(body)
 
@@ -109,6 +125,7 @@ func PlayHandler(w http.ResponseWriter, r *http.Request) {
 	if playResp.StatusCode == http.StatusNoContent {
 		fmt.Fprintln(w, "Playback resumed.")
 	} else {
-		http.Error(w, "Status: "+playResp.Status, playResp.StatusCode)
+		bodyBytes, _ := io.ReadAll(playResp.Body)
+		http.Error(w, "Playback error: "+string(bodyBytes), playResp.StatusCode)
 	}
 }
