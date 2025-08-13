@@ -19,11 +19,53 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(disposable);
 
-	const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right);
-	statusBarItem.text = '$(sync~spin) Fetching Spotify...';
-	statusBarItem.show();
-	context.subscriptions.push(statusBarItem);
+	// Pause command
+    const pauseCmd = vscode.commands.registerCommand('frontend.spotifyPause', async () => {
+        try {
+            const res = await fetch('http://127.0.0.1:12345/pause', { method: 'PUT' });
+            const text = await res.text();
+            vscode.window.showInformationMessage(`Pause: ${text}`);
+        } catch (err) {
+            vscode.window.showErrorMessage(`Pause error: ${err}`);
+        }
+    });
+    context.subscriptions.push(pauseCmd);
 
+    // Play command
+    const playCmd = vscode.commands.registerCommand('frontend.spotifyPlay', async () => {
+        try {
+            const res = await fetch('http://127.0.0.1:12345/play', { method: 'PUT' });
+            const text = await res.text();
+            vscode.window.showInformationMessage(`Play: ${text}`);
+        } catch (err) {
+            vscode.window.showErrorMessage(`Play error: ${err}`);
+        }
+    });
+    context.subscriptions.push(playCmd);
+
+    // Status Bar: Song
+    const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+    statusBarItem.text = '$(sync~spin) Fetching Spotify...';
+    statusBarItem.show();
+    context.subscriptions.push(statusBarItem);
+
+    // Status Bar: Play Button
+    const playButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 99);
+    playButton.text = '$(play)';
+    playButton.tooltip = 'Play Spotify';
+    playButton.command = 'frontend.spotifyPlay';
+    playButton.show();
+    context.subscriptions.push(playButton);
+
+    // Status Bar: Pause Button
+    const pauseButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 98);
+    pauseButton.text = '$(debug-pause)';
+    pauseButton.tooltip = 'Pause Spotify';
+    pauseButton.command = 'frontend.spotifyPause';
+    pauseButton.show();
+    context.subscriptions.push(pauseButton);
+
+	// Poll spotify
 	async function updateSpotifyStatus() {
 		try {
 			const res = await fetch('http://127.0.0.1:12345/nowplaying');
