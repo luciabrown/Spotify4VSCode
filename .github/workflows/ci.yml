@@ -3,7 +3,7 @@ name: CI Workflow
 on:
   push:
     branches:
-      - issue-5-prev-next-track
+      - main
 
 jobs:
   docker:
