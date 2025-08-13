@@ -18,6 +18,14 @@
       {
         "command": "frontend.iAmTesting",
         "title": "This is a Test"
+      },
+      {
+        "command": "frontend.spotifyPause",
+        "title": "Spotify: Pause"
+      },
+      {
+        "command": "frontend.spotifyPlay",
+        "title": "Spotify: Play"
       }
     ]
   },
