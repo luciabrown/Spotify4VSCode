@@ -11,8 +11,6 @@ interface SpotifyNowPlaying {
 }
 
 export function activate(context: vscode.ExtensionContext) {
-	//vscode.window.showInformationMessage('Spotify extension is activated!');
-  	//console.log('Spotify extension is activated!');
 
 	const disposable = vscode.commands.registerCommand('frontend.helloWorld', () => {
 		vscode.window.showInformationMessage('Hello World from SpotifyNowListening!');
@@ -42,6 +40,30 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
     context.subscriptions.push(playCmd);
+    
+    // Prev command
+    const prevCmd = vscode.commands.registerCommand('frontend.spotifyPrev', async () => {
+        try {
+            const res = await fetch('http://127.0.0.1:12345/prev', { method: 'POST' });
+            const text = await res.text();
+            vscode.window.showInformationMessage(`Prev: ${text}`);
+        } catch (err) {
+            vscode.window.showErrorMessage(`Prev error: ${err}`);
+        }
+    });
+    context.subscriptions.push(prevCmd);
+
+    // Next command
+    const nextCmd = vscode.commands.registerCommand('frontend.spotifyNext', async () => {
+        try {
+            const res = await fetch('http://127.0.0.1:12345/next', { method: 'POST' });
+            const text = await res.text();
+            vscode.window.showInformationMessage(`Next: ${text}`);
+        } catch (err) {
+            vscode.window.showErrorMessage(`Next error: ${err}`);
+        }
+    });
+    context.subscriptions.push(nextCmd);
 
     // Status Bar: Song
     const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
@@ -64,6 +86,22 @@ export function activate(context: vscode.ExtensionContext) {
     pauseButton.command = 'frontend.spotifyPause';
     pauseButton.show();
     context.subscriptions.push(pauseButton);
+
+    // Status Bar: Prev Button
+    const prevButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 99);
+    prevButton.text = '$(prev)';
+    prevButton.tooltip = 'Previous Spotify';
+    prevButton.command = 'frontend.spotifyPrev';
+    prevButton.show();
+    context.subscriptions.push(prevButton);
+
+    // Status Bar: Next Button
+    const nextButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 98);
+    nextButton.text = '$(debug-next)';
+    nextButton.tooltip = 'Next Spotify';
+    nextButton.command = 'frontend.spotifyNext';
+    nextButton.show();
+    context.subscriptions.push(nextButton);
 
 	// Poll spotify
 	async function updateSpotifyStatus() {

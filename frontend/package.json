@@ -27,6 +27,15 @@
         "command": "frontend.spotifyPlay",
         "title": "Spotify: Play"
       }
+      ,
+      {
+        "command": "frontend.spotifyPrev",
+        "title": "Spotify: Prev"
+      },
+      {
+        "command": "frontend.spotifyNext",
+        "title": "Spotify: Next"
+      }
     ]
   },
   "scripts": {
