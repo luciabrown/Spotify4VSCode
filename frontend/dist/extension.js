@@ -115,15 +115,15 @@ function activate(context) {
     pauseButton.show();
     context.subscriptions.push(pauseButton);
     // Status Bar: Prev Button
-    const prevButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 99);
-    prevButton.text = '$(prev)';
+    const prevButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 97);
+    prevButton.text = '$(triangle-left)';
     prevButton.tooltip = 'Previous Spotify';
     prevButton.command = 'frontend.spotifyPrev';
     prevButton.show();
     context.subscriptions.push(prevButton);
     // Status Bar: Next Button
-    const nextButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 98);
-    nextButton.text = '$(debug-next)';
+    const nextButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 96);
+    nextButton.text = '$(triangle-right)';
     nextButton.tooltip = 'Next Spotify';
     nextButton.command = 'frontend.spotifyNext';
     nextButton.show();
