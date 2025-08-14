@@ -100,20 +100,13 @@ function activate(context) {
     statusBarItem.text = '$(sync~spin) Fetching Spotify...';
     statusBarItem.show();
     context.subscriptions.push(statusBarItem);
-    // Status Bar: Play Button
+    // Status Bar: Play/Pause Button
     const playButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 99);
     playButton.text = '$(play)';
-    playButton.tooltip = 'Play Spotify';
-    playButton.command = 'frontend.spotifyPlay';
+    playButton.tooltip = 'PlayPause Spotify';
+    playButton.command = 'frontend.spotifyPlayPause';
     playButton.show();
     context.subscriptions.push(playButton);
-    // Status Bar: Pause Button
-    const pauseButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 98);
-    pauseButton.text = '$(debug-pause)';
-    pauseButton.tooltip = 'Pause Spotify';
-    pauseButton.command = 'frontend.spotifyPause';
-    pauseButton.show();
-    context.subscriptions.push(pauseButton);
     // Status Bar: Prev Button
     const prevButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 97);
     prevButton.text = '$(triangle-left)';

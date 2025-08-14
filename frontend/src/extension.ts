@@ -17,22 +17,10 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(disposable);
 
-	// Pause command
-    const pauseCmd = vscode.commands.registerCommand('frontend.spotifyPause', async () => {
-        try {
-            const res = await fetch('http://127.0.0.1:12345/pause', { method: 'PUT' });
-            const text = await res.text();
-            vscode.window.showInformationMessage(`Pause: ${text}`);
-        } catch (err) {
-            vscode.window.showErrorMessage(`Pause error: ${err}`);
-        }
-    });
-    context.subscriptions.push(pauseCmd);
-
     // Play command
-    const playCmd = vscode.commands.registerCommand('frontend.spotifyPlay', async () => {
+    const playCmd = vscode.commands.registerCommand('frontend.spotifyPlayPause', async () => {
         try {
-            const res = await fetch('http://127.0.0.1:12345/play', { method: 'PUT' });
+            const res = await fetch('http://127.0.0.1:12345/playpause', { method: 'PUT' });
             const text = await res.text();
             vscode.window.showInformationMessage(`Play: ${text}`);
         } catch (err) {
@@ -71,21 +59,13 @@ export function activate(context: vscode.ExtensionContext) {
     statusBarItem.show();
     context.subscriptions.push(statusBarItem);
 
-    // Status Bar: Play Button
+    // Status Bar: Play/Pause Button
     const playButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 99);
     playButton.text = '$(play)';
-    playButton.tooltip = 'Play Spotify';
-    playButton.command = 'frontend.spotifyPlay';
+    playButton.tooltip = 'PlayPause Spotify';
+    playButton.command = 'frontend.spotifyPlayPause';
     playButton.show();
     context.subscriptions.push(playButton);
-
-    // Status Bar: Pause Button
-    const pauseButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 98);
-    pauseButton.text = '$(debug-pause)';
-    pauseButton.tooltip = 'Pause Spotify';
-    pauseButton.command = 'frontend.spotifyPause';
-    pauseButton.show();
-    context.subscriptions.push(pauseButton);
 
     // Status Bar: Prev Button
     const prevButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 97);
