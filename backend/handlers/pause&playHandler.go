@@ -11,45 +11,14 @@ import (
 // Fallback track
 const fallbackTrackURI = "spotify:track:4cOdK2wGLETKBW3PvgPWqT"
 
-// PauseHandler pauses the currently playing Spotify track if any.
-func PauseHandler(w http.ResponseWriter, r *http.Request) {
+func TogglePlayHandler(w http.ResponseWriter, r *http.Request) {
 	client, err := getClient()
 	if err != nil {
 		http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	req, err := http.NewRequest(http.MethodPut, "https://api.spotify.com/v1/me/player/pause", nil)
-	if err != nil {
-		http.Error(w, "Failed to create request: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		http.Error(w, "Failed to pause playback: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode == http.StatusNoContent {
-		fmt.Fprintln(w, "Playback paused successfully.")
-	} else if resp.StatusCode == http.StatusNotFound {
-		http.Error(w, "No active playback found.", http.StatusNotFound)
-	} else {
-		http.Error(w, "Status: "+resp.Status, resp.StatusCode)
-	}
-}
-
-// PlayHandlers plays the Spotify track
-func PlayHandler(w http.ResponseWriter, r *http.Request) {
-	client, err := getClient()
-	if err != nil {
-		http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
-		return
-	}
-
-	// Get current playback state
+	// Step 1: Get current playback state
 	playbackReq, err := http.NewRequest(http.MethodGet, "https://api.spotify.com/v1/me/player", nil)
 	if err != nil {
 		http.Error(w, "Failed to create playback request: "+err.Error(), http.StatusInternalServerError)
@@ -63,6 +32,10 @@ func PlayHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode == http.StatusNoContent {
+		http.Error(w, "No active playback found.", http.StatusNotFound)
+		return
+	}
 	if resp.StatusCode != http.StatusOK {
 		http.Error(w, "Failed to get playback state: "+resp.Status, resp.StatusCode)
 		return
@@ -80,8 +53,7 @@ func PlayHandler(w http.ResponseWriter, r *http.Request) {
 		} `json:"item"`
 	}
 
-	err = json.NewDecoder(resp.Body).Decode(&playbackState)
-	if err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&playbackState); err != nil {
 		http.Error(w, "Failed to parse playback state: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -91,41 +63,63 @@ func PlayHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	trackToPlay := playbackState.Item.URI
-	if trackToPlay == "" {
-		trackToPlay = fallbackTrackURI
-	}
+	// Step 2: Toggle based on current state
+	if playbackState.IsPlaying {
+		// Pause
+		req, err := http.NewRequest(http.MethodPut, "https://api.spotify.com/v1/me/player/pause", nil)
+		if err != nil {
+			http.Error(w, "Failed to create pause request: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		resp, err := client.Do(req)
+		if err != nil {
+			http.Error(w, "Failed to pause playback: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer resp.Body.Close()
 
-	// Ensure position_ms is within the track duration, else reset to 0
-	pos := playbackState.ProgressMs
-	if pos >= playbackState.Item.Duration {
-		pos = 0
-	}
-
-	body := map[string]interface{}{
-		"uris":        []string{trackToPlay},
-		"position_ms": pos,
-	}
-	jsonBody, _ := json.Marshal(body)
-
-	playReq, err := http.NewRequest(http.MethodPut, "https://api.spotify.com/v1/me/player/play", bytes.NewReader(jsonBody))
-	if err != nil {
-		http.Error(w, "Failed to create play request: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	playReq.Header.Set("Content-Type", "application/json")
-
-	playResp, err := client.Do(playReq)
-	if err != nil {
-		http.Error(w, "Failed to play track: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer playResp.Body.Close()
-
-	if playResp.StatusCode == http.StatusNoContent {
-		fmt.Fprintln(w, "Playback resumed.")
+		if resp.StatusCode == http.StatusNoContent {
+			fmt.Fprintln(w, "Playback paused.")
+		} else {
+			http.Error(w, "Pause error: "+resp.Status, resp.StatusCode)
+		}
 	} else {
-		bodyBytes, _ := io.ReadAll(playResp.Body)
-		http.Error(w, "Playback error: "+string(bodyBytes), playResp.StatusCode)
+		// Play
+		trackToPlay := playbackState.Item.URI
+		if trackToPlay == "" {
+			trackToPlay = fallbackTrackURI
+		}
+
+		pos := playbackState.ProgressMs
+		if pos >= playbackState.Item.Duration {
+			pos = 0
+		}
+
+		body := map[string]interface{}{
+			"uris":        []string{trackToPlay},
+			"position_ms": pos,
+		}
+		jsonBody, _ := json.Marshal(body)
+
+		playReq, err := http.NewRequest(http.MethodPut, "https://api.spotify.com/v1/me/player/play", bytes.NewReader(jsonBody))
+		if err != nil {
+			http.Error(w, "Failed to create play request: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		playReq.Header.Set("Content-Type", "application/json")
+
+		playResp, err := client.Do(playReq)
+		if err != nil {
+			http.Error(w, "Failed to play track: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer playResp.Body.Close()
+
+		if playResp.StatusCode == http.StatusNoContent {
+			fmt.Fprintln(w, "Playback started/resumed.")
+		} else {
+			bodyBytes, _ := io.ReadAll(playResp.Body)
+			http.Error(w, "Playback error: "+string(bodyBytes), playResp.StatusCode)
+		}
 	}
 }

@@ -36,10 +36,9 @@ func main() {
 	http.HandleFunc("/nowplaying", handlers.NowPlayingHandler) // Start the handler to find song
 	//http.HandleFunc("/coverart", handlers.CoverArtHandler)     // Get cover art
 
-	http.HandleFunc("/pause", handlers.PauseHandler)
-	http.HandleFunc("/play", handlers.PlayHandler)
-	http.HandleFunc("/prev", handlers.PreviousTrackHandler)
-	http.HandleFunc("/next", handlers.NextTrackHandler)
+	http.HandleFunc("/playpause", handlers.TogglePlayHandler) //play if paused, pause if playing
+	http.HandleFunc("/prev", handlers.PreviousTrackHandler)   //go to prev track
+	http.HandleFunc("/next", handlers.NextTrackHandler)       //go to next track
 
 	// Log notes
 	log.Println("Starting server on :12345")
