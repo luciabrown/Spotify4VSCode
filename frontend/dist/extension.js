@@ -47,22 +47,10 @@ function activate(context) {
         vscode.window.showInformationMessage('Hello World from SpotifyNowListening!');
     });
     context.subscriptions.push(disposable);
-    // Pause command
-    const pauseCmd = vscode.commands.registerCommand('frontend.spotifyPause', async () => {
-        try {
-            const res = await fetch('http://127.0.0.1:12345/pause', { method: 'PUT' });
-            const text = await res.text();
-            vscode.window.showInformationMessage(`Pause: ${text}`);
-        }
-        catch (err) {
-            vscode.window.showErrorMessage(`Pause error: ${err}`);
-        }
-    });
-    context.subscriptions.push(pauseCmd);
     // Play command
-    const playCmd = vscode.commands.registerCommand('frontend.spotifyPlay', async () => {
+    const playCmd = vscode.commands.registerCommand('frontend.spotifyPlayPause', async () => {
         try {
-            const res = await fetch('http://127.0.0.1:12345/play', { method: 'PUT' });
+            const res = await fetch('http://127.0.0.1:12345/playpause', { method: 'PUT' });
             const text = await res.text();
             vscode.window.showInformationMessage(`Play: ${text}`);
         }
