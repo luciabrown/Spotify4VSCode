@@ -65,6 +65,7 @@ function activate(context) {
             const res = await fetch('http://127.0.0.1:12345/prev', { method: 'POST' });
             const text = await res.text();
             vscode.window.showInformationMessage(`Prev: ${text}`);
+            updateSpotifyStatus();
         }
         catch (err) {
             vscode.window.showErrorMessage(`Prev error: ${err}`);
@@ -77,9 +78,11 @@ function activate(context) {
             const res = await fetch('http://127.0.0.1:12345/next', { method: 'POST' });
             const text = await res.text();
             vscode.window.showInformationMessage(`Next: ${text}`);
+            updateSpotifyStatus();
         }
         catch (err) {
             vscode.window.showErrorMessage(`Next error: ${err}`);
+            updateSpotifyStatus();
         }
     });
     context.subscriptions.push(nextCmd);
@@ -96,14 +99,14 @@ function activate(context) {
     playButton.show();
     context.subscriptions.push(playButton);
     // Status Bar: Prev Button
-    const prevButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 97);
+    const prevButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 98);
     prevButton.text = '$(debug-reverse-continue)';
     prevButton.tooltip = 'Previous Spotify';
     prevButton.command = 'frontend.spotifyPrev';
     prevButton.show();
     context.subscriptions.push(prevButton);
     // Status Bar: Next Button
-    const nextButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 96);
+    const nextButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 97);
     nextButton.text = '$(debug-continue)';
     nextButton.tooltip = 'Next Spotify';
     nextButton.command = 'frontend.spotifyNext';

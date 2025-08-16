@@ -35,6 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
             const res = await fetch('http://127.0.0.1:12345/prev', { method: 'POST' });
             const text = await res.text();
             vscode.window.showInformationMessage(`Prev: ${text}`);
+            updateSpotifyStatus();
         } catch (err) {
             vscode.window.showErrorMessage(`Prev error: ${err}`);
         }
@@ -47,8 +48,10 @@ export function activate(context: vscode.ExtensionContext) {
             const res = await fetch('http://127.0.0.1:12345/next', { method: 'POST' });
             const text = await res.text();
             vscode.window.showInformationMessage(`Next: ${text}`);
+            updateSpotifyStatus();
         } catch (err) {
             vscode.window.showErrorMessage(`Next error: ${err}`);
+            updateSpotifyStatus();
         }
     });
     context.subscriptions.push(nextCmd);
