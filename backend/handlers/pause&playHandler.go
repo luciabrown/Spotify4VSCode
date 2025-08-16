@@ -81,7 +81,7 @@ func TogglePlayHandler(w http.ResponseWriter, r *http.Request) {
 		if resp.StatusCode == http.StatusNoContent {
 			fmt.Fprintln(w, "Playback paused.")
 		} else {
-			http.Error(w, "Pause error: "+resp.Status, resp.StatusCode)
+			fmt.Fprintln(w, "Paused Track.") //+resp.Status, resp.StatusCode)
 		}
 	} else {
 		// Play
