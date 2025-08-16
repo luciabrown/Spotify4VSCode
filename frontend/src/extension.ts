@@ -68,7 +68,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(playButton);
 
     // Status Bar: Prev Button
-    const prevButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 97);
+    const prevButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 98);
     prevButton.text = '$(debug-reverse-continue)';
     prevButton.tooltip = 'Previous Spotify';
     prevButton.command = 'frontend.spotifyPrev';
@@ -76,7 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(prevButton);
 
     // Status Bar: Next Button
-    const nextButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 96);
+    const nextButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 97);
     nextButton.text =  '$(debug-continue)';
     nextButton.tooltip = 'Next Spotify';
     nextButton.command = 'frontend.spotifyNext';
