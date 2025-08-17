@@ -52,7 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.window.showInformationMessage(`Next: ${text}`);
             updateSpotifyStatus();
         } catch (err) {
-            await delay(300); // give Spotify time to switch tracks
+            await delay(400); // give Spotify time to switch tracks
             updateSpotifyStatus(); //show new track
         }
     });
