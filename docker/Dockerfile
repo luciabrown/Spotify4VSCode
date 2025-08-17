@@ -25,7 +25,7 @@ COPY ../frontend ./
 RUN npm run compile
 
 # ---------- Final stage ----------
-FROM alpine:latest
+FROM debian:bullseye-slim
 
 WORKDIR /app
 
