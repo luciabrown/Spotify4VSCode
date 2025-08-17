@@ -12,7 +12,11 @@
     "ms-vscode.go",
     "ms-vscode.vscode-typescript-tslint-plugin"
   ],
+  "mounts": [
+  "source=${localEnv:.env},target=/app/.env,type=bind,consistency=cached"
+],
   "settings": {
     "terminal.integrated.shell.linux": "/bin/sh"
   }
+  
 } 
