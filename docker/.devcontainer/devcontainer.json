@@ -1,15 +1,15 @@
 {
   "name": "Project Full Dev Container",
-  "dockerFile": "..//Dockerfile",
-  "context": "../..",
-  "workspaceFolder": "/workspace",
-  "forwardPorts": [12345],
-  "mounts": [
-    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+  "image": "project-full-dev:latest",
+ // "context": "../..",
+  "workspaceFolder": "/app",
+  "postStartCommand": "/app/project-full &",
+  "remoteUser": "root",
+  "extensions": [
+    "ms-vscode.go",
+    "ms-vscode.vscode-typescript-tslint-plugin"
   ],
-  "postStartCommand": "./project-full &", 
-//  "extensions": [
-//    "your.extension.id"  // Replace with your VSCode extension ID if published
-//  ],
-  "remoteUser": "root"
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/sh"
+  }
 }
