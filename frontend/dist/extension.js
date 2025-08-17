@@ -156,6 +156,8 @@ function activate(context) {
             statusBarItem.text = '$(error) Failed to fetch Spotify';
         }
     }
+    updateSpotifyStatus();
+    startPolling();
 }
 function deactivate() { }
 
