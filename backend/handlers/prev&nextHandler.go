@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 )
 
@@ -36,8 +35,8 @@ func NextTrackHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No active playback found.", http.StatusNotFound)
 		go http.Get("http://127.0.0.1:12345/nowplaying")
 	} else {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		http.Error(w, "Ekipped to next track."+string(bodyBytes), resp.StatusCode)
+		//bodyBytes, _ := io.ReadAll(resp.Body)
+		fmt.Fprintln(w, "Skipped to next track.") //+string(bodyBytes), resp.StatusCode)
 		go http.Get("http://127.0.0.1:12345/nowplaying")
 	}
 }
@@ -72,8 +71,7 @@ func PreviousTrackHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No active playback found.", http.StatusNotFound)
 		go http.Get("http://127.0.0.1:12345/nowplaying")
 	} else {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		http.Error(w, "Error skipping track: "+string(bodyBytes), resp.StatusCode)
+		fmt.Fprintln(w, "Skipped to previous track.")
 		go http.Get("http://127.0.0.1:12345/nowplaying")
 	}
 }

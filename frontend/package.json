@@ -16,16 +16,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "frontend.iAmTesting",
-        "title": "This is a Test"
-      },
-      {
-        "command": "frontend.spotifyPause",
-        "title": "Spotify: Pause"
-      },
-      {
-        "command": "frontend.spotifyPlay",
-        "title": "Spotify: Play"
+        "command": "frontend.spotifyPlayPause",
+        "title": "Spotify: PlayPause"
       }
       ,
       {
