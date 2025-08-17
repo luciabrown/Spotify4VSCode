@@ -25,7 +25,7 @@ COPY ../frontend ./
 RUN npm run compile
 
 # ---------- Final stage ----------
-FROM node:20-alpine:latest
+FROM alpine:latest
 
 WORKDIR /app
 

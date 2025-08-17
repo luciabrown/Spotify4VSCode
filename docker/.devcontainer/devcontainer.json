@@ -1,6 +1,9 @@
 {
   "name": "Project Full Dev Container",
   "image": "luciafbrown/project-full:latest",
+  "features": {
+    "node": "20"
+  },
  // "context": "../..",
   "workspaceFolder": "/app",
   "postStartCommand": "/app/project-full &",
@@ -12,4 +15,4 @@
   "settings": {
     "terminal.integrated.shell.linux": "/bin/sh"
   }
-}
+} 
