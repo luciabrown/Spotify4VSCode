@@ -131,6 +131,9 @@ export function activate(context: vscode.ExtensionContext) {
 			statusBarItem.text = '$(error) Failed to fetch Spotify';
 		}
 	}
+
+    updateSpotifyStatus();
+    startPolling();
 }
 
 export function deactivate() {}

@@ -63,28 +63,34 @@ function activate(context) {
     // Prev command
     const prevCmd = vscode.commands.registerCommand('frontend.spotifyPrev', async () => {
         try {
+            stopPolling();
             const res = await fetch('http://127.0.0.1:12345/prev', { method: 'POST' });
             const text = await res.text();
             vscode.window.showInformationMessage(`Prev: ${text}`);
             await delay(300); // give Spotify time to switch tracks
             updateSpotifyStatus(); //show new track
+            startPolling();
         }
         catch (err) {
             vscode.window.showErrorMessage(`Prev error: ${err}`);
+            startPolling();
         }
     });
     context.subscriptions.push(prevCmd);
     // Next command
     const nextCmd = vscode.commands.registerCommand('frontend.spotifyNext', async () => {
         try {
+            stopPolling();
             const res = await fetch('http://127.0.0.1:12345/next', { method: 'POST' });
             const text = await res.text();
             vscode.window.showInformationMessage(`Next: ${text}`);
             updateSpotifyStatus();
+            startPolling();
         }
         catch (err) {
             await delay(400); // give Spotify time to switch tracks
             updateSpotifyStatus(); //show new track
+            startPolling();
         }
     });
     context.subscriptions.push(nextCmd);
@@ -114,6 +120,18 @@ function activate(context) {
     nextButton.command = 'frontend.spotifyNext';
     nextButton.show();
     context.subscriptions.push(nextButton);
+    let pollInterval;
+    // Poll control
+    function startPolling() {
+        stopPolling();
+        pollInterval = setInterval(updateSpotifyStatus, 15000);
+    }
+    function stopPolling() {
+        if (pollInterval) {
+            clearInterval(pollInterval);
+            pollInterval = undefined;
+        }
+    }
     // Poll spotify
     async function updateSpotifyStatus() {
         try {
@@ -138,8 +156,6 @@ function activate(context) {
             statusBarItem.text = '$(error) Failed to fetch Spotify';
         }
     }
-    updateSpotifyStatus();
-    setInterval(updateSpotifyStatus, 15000);
 }
 function deactivate() { }
 
