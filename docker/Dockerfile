@@ -9,7 +9,7 @@ RUN go mod download
 
 COPY ../ ./
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /app/project-backend ./backend/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/project-full ./backend/main.go
 
 # ---------- Extension Builder stage ----------
 FROM node:20-alpine AS frontend-builder
@@ -34,7 +34,7 @@ ARG CLIENT_ID
 ARG CLIENT_SECRET
 ARG REDIRECT_URI
 
-COPY --from=backend-builder /app/project-backend ./project-backend
+COPY --from=backend-builder /app/project-full ./project-full
 COPY --from=frontend-builder /extension/dist ./extension
 
 # GET INTO FROM .ENV
@@ -42,10 +42,10 @@ RUN echo "CLIENT_ID=$CLIENT_ID" > .env \
  && echo "CLIENT_SECRET=$CLIENT_SECRET" >> .env \
  && echo "REDIRECT_URI=$REDIRECT_URI" >> .env
 
-#COPY --from=backend-builder /app/project-backend ./project-backend
+#COPY --from=backend-builder /app/project-full ./project-full
  
 # Expose the port
 EXPOSE 12345
 
 # Run
-CMD ["./project-backend"]
+CMD ["./project-full"]
