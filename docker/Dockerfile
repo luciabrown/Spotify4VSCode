@@ -21,9 +21,7 @@ COPY ../frontend/package*.json ./
 
 # Install and compile
 RUN npm install --include=dev
-
-COPY ../frontend/src ./src
-COPY ../frontend/vsc-extension-*.json ./
+COPY ../frontend ./
 RUN npm run compile
 
 # ---------- Final stage ----------
