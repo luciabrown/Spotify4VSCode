@@ -20,7 +20,7 @@ WORKDIR /extension
 COPY ../frontend/package*.json ./
 
 # Install and compile
-RUN npm install
+RUN npm install --include=dev
 
 COPY ../frontend/src ./src
 COPY ../frontend/vsc-extension-*.json ./
