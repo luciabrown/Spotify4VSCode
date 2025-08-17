@@ -12,6 +12,7 @@ interface SpotifyNowPlaying {
 
 export function activate(context: vscode.ExtensionContext) {
 
+    const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
 	const disposable = vscode.commands.registerCommand('frontend.helloWorld', () => {
 		vscode.window.showInformationMessage('Hello World from SpotifyNowListening!');
 	});
@@ -35,7 +36,8 @@ export function activate(context: vscode.ExtensionContext) {
             const res = await fetch('http://127.0.0.1:12345/prev', { method: 'POST' });
             const text = await res.text();
             vscode.window.showInformationMessage(`Prev: ${text}`);
-            updateSpotifyStatus();
+            await delay(300); // give Spotify time to switch tracks
+            updateSpotifyStatus(); //show new track
         } catch (err) {
             vscode.window.showErrorMessage(`Prev error: ${err}`);
         }
@@ -50,8 +52,8 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.window.showInformationMessage(`Next: ${text}`);
             updateSpotifyStatus();
         } catch (err) {
-            vscode.window.showErrorMessage(`Next error: ${err}`);
-            updateSpotifyStatus();
+            await delay(300); // give Spotify time to switch tracks
+            updateSpotifyStatus(); //show new track
         }
     });
     context.subscriptions.push(nextCmd);
