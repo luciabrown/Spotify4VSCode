@@ -1,5 +1,5 @@
-# ---------- Builder stage ----------
-FROM golang:1.24.5-alpine AS builder
+# ---------- Go Builder stage ----------
+FROM golang:1.24.5-alpine AS backend-builder
 
 WORKDIR /app
 
@@ -11,6 +11,20 @@ COPY ../ ./
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o /app/project-backend ./backend/main.go
 
+# ---------- Extension Builder stage ----------
+FROM node:20-alpine AS frontend-builder
+
+WORKDIR /extension
+
+# Copy extension sources
+COPY ../frontend/package*.json ./
+
+# Install and compile
+RUN npm install
+
+COPY ../frontend ./
+RUN npm run compile
+
 # ---------- Final stage ----------
 FROM alpine:latest
 
@@ -20,14 +34,15 @@ ARG CLIENT_ID
 ARG CLIENT_SECRET
 ARG REDIRECT_URI
 
-COPY --from=builder /app/project-backend ./project-backend
+COPY --from=backend-builder /app/project-backend ./project-backend
+COPY --from=frontend-builder /extension/dist ./extension
 
 # GET INTO FROM .ENV
 RUN echo "CLIENT_ID=$CLIENT_ID" > .env \
  && echo "CLIENT_SECRET=$CLIENT_SECRET" >> .env \
  && echo "REDIRECT_URI=$REDIRECT_URI" >> .env
 
-COPY --from=builder /app/project-backend ./project-backend
+#COPY --from=backend-builder /app/project-backend ./project-backend
  
 # Expose the port
 EXPOSE 12345
