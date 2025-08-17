@@ -1,7 +1,7 @@
 {
   "name": "Project Full Dev Container",
-  "dockerFile": "Dockerfile",
-  "context": "..",
+  "dockerFile": "..//Dockerfile",
+  "context": "../..",
   "workspaceFolder": "/workspace",
   "forwardPorts": [12345],
   "mounts": [
