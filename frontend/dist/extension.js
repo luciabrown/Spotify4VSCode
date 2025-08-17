@@ -84,11 +84,11 @@ function activate(context) {
             const res = await fetch('http://127.0.0.1:12345/next', { method: 'POST' });
             const text = await res.text();
             vscode.window.showInformationMessage(`Next: ${text}`);
+            await delay(400); // give Spotify time to switch tracks
             updateSpotifyStatus();
             startPolling();
         }
         catch (err) {
-            await delay(400); // give Spotify time to switch tracks
             updateSpotifyStatus(); //show new track
             startPolling();
         }
