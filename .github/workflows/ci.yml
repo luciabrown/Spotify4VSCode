@@ -34,7 +34,7 @@ jobs:
       - name: Test Frontend Build
         working-directory: frontend
         run: |
-          npm ci
+#          npm ci
           npm run compil
 
       - name: Build and Push Docker image
