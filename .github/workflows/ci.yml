@@ -35,7 +35,7 @@ jobs:
         working-directory: frontend
         run: |
 #          npm ci
-          npm run compil
+          npm run compile
 
       - name: Build and Push Docker image
         uses: docker/build-push-action@v5
