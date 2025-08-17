@@ -1,6 +1,6 @@
 {
   "name": "Project Full Dev Container",
-  "image": "project-full:latest",
+  "image": "luciafbrown/project-full:latest",
  // "context": "../..",
   "workspaceFolder": "/app",
   "postStartCommand": "/app/project-full &",
