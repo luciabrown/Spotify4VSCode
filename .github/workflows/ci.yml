@@ -31,6 +31,10 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install --prefer-offline --no-audit --progress=false
+
       - name: Test Frontend Build
         working-directory: frontend
         run: npm run compile
