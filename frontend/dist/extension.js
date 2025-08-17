@@ -43,6 +43,7 @@ exports.activate = activate;
 exports.deactivate = deactivate;
 const vscode = __importStar(__webpack_require__(1));
 function activate(context) {
+    const delay = (ms) => new Promise(r => setTimeout(r, ms));
     const disposable = vscode.commands.registerCommand('frontend.helloWorld', () => {
         vscode.window.showInformationMessage('Hello World from SpotifyNowListening!');
     });
@@ -62,24 +63,34 @@ function activate(context) {
     // Prev command
     const prevCmd = vscode.commands.registerCommand('frontend.spotifyPrev', async () => {
         try {
+            stopPolling();
             const res = await fetch('http://127.0.0.1:12345/prev', { method: 'POST' });
             const text = await res.text();
             vscode.window.showInformationMessage(`Prev: ${text}`);
+            await delay(300); // give Spotify time to switch tracks
+            updateSpotifyStatus(); //show new track
+            startPolling();
         }
         catch (err) {
             vscode.window.showErrorMessage(`Prev error: ${err}`);
+            startPolling();
         }
     });
     context.subscriptions.push(prevCmd);
     // Next command
     const nextCmd = vscode.commands.registerCommand('frontend.spotifyNext', async () => {
         try {
+            stopPolling();
             const res = await fetch('http://127.0.0.1:12345/next', { method: 'POST' });
             const text = await res.text();
             vscode.window.showInformationMessage(`Next: ${text}`);
+            await delay(400); // give Spotify time to switch tracks
+            updateSpotifyStatus();
+            startPolling();
         }
         catch (err) {
-            vscode.window.showErrorMessage(`Next error: ${err}`);
+            updateSpotifyStatus(); //show new track
+            startPolling();
         }
     });
     context.subscriptions.push(nextCmd);
@@ -96,19 +107,31 @@ function activate(context) {
     playButton.show();
     context.subscriptions.push(playButton);
     // Status Bar: Prev Button
-    const prevButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 97);
+    const prevButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 98);
     prevButton.text = '$(debug-reverse-continue)';
     prevButton.tooltip = 'Previous Spotify';
     prevButton.command = 'frontend.spotifyPrev';
     prevButton.show();
     context.subscriptions.push(prevButton);
     // Status Bar: Next Button
-    const nextButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 96);
+    const nextButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 97);
     nextButton.text = '$(debug-continue)';
     nextButton.tooltip = 'Next Spotify';
     nextButton.command = 'frontend.spotifyNext';
     nextButton.show();
     context.subscriptions.push(nextButton);
+    let pollInterval;
+    // Poll control
+    function startPolling() {
+        stopPolling();
+        pollInterval = setInterval(updateSpotifyStatus, 15000);
+    }
+    function stopPolling() {
+        if (pollInterval) {
+            clearInterval(pollInterval);
+            pollInterval = undefined;
+        }
+    }
     // Poll spotify
     async function updateSpotifyStatus() {
         try {
@@ -134,7 +157,7 @@ function activate(context) {
         }
     }
     updateSpotifyStatus();
-    setInterval(updateSpotifyStatus, 15000);
+    startPolling();
 }
 function deactivate() { }
 

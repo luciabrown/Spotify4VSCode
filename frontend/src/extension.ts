@@ -12,6 +12,7 @@ interface SpotifyNowPlaying {
 
 export function activate(context: vscode.ExtensionContext) {
 
+    const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
 	const disposable = vscode.commands.registerCommand('frontend.helloWorld', () => {
 		vscode.window.showInformationMessage('Hello World from SpotifyNowListening!');
 	});
@@ -32,11 +33,16 @@ export function activate(context: vscode.ExtensionContext) {
     // Prev command
     const prevCmd = vscode.commands.registerCommand('frontend.spotifyPrev', async () => {
         try {
+            stopPolling();
             const res = await fetch('http://127.0.0.1:12345/prev', { method: 'POST' });
             const text = await res.text();
             vscode.window.showInformationMessage(`Prev: ${text}`);
+            await delay(300); // give Spotify time to switch tracks
+            updateSpotifyStatus(); //show new track
+            startPolling();
         } catch (err) {
             vscode.window.showErrorMessage(`Prev error: ${err}`);
+            startPolling();
         }
     });
     context.subscriptions.push(prevCmd);
@@ -44,11 +50,16 @@ export function activate(context: vscode.ExtensionContext) {
     // Next command
     const nextCmd = vscode.commands.registerCommand('frontend.spotifyNext', async () => {
         try {
+            stopPolling();
             const res = await fetch('http://127.0.0.1:12345/next', { method: 'POST' });
             const text = await res.text();
             vscode.window.showInformationMessage(`Next: ${text}`);
+            await delay(400); // give Spotify time to switch tracks
+            updateSpotifyStatus();
+            startPolling();
         } catch (err) {
-            vscode.window.showErrorMessage(`Next error: ${err}`);
+            updateSpotifyStatus(); //show new track
+            startPolling();
         }
     });
     context.subscriptions.push(nextCmd);
@@ -83,6 +94,21 @@ export function activate(context: vscode.ExtensionContext) {
     nextButton.show();
     context.subscriptions.push(nextButton);
 
+    let pollInterval: NodeJS.Timeout | undefined;
+
+    // Poll control
+    function startPolling() {
+        stopPolling();
+        pollInterval = setInterval(updateSpotifyStatus, 15000);
+    }
+
+    function stopPolling() {
+        if (pollInterval) {
+            clearInterval(pollInterval);
+            pollInterval = undefined;
+        }
+    }
+
 	// Poll spotify
 	async function updateSpotifyStatus() {
 		try {
@@ -106,7 +132,8 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	}
 
-	updateSpotifyStatus();
-	setInterval(updateSpotifyStatus, 15000);
+    updateSpotifyStatus();
+    startPolling();
 }
+
 export function deactivate() {}

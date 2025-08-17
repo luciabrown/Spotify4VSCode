@@ -108,7 +108,7 @@ func NowPlayingHandler(w http.ResponseWriter, r *http.Request) {
 		"album":         raw.Item.Album.Name,
 		"album_art_url": albumArt,
 		"spotify_url":   raw.Item.ExternalURLs.Spotify,
-		"description":   fmt.Sprintf("🎵 Now playing: '%s' by %s", raw.Item.Name, artists),
+		"description":   fmt.Sprintf("Now playing: '%s' by %s", raw.Item.Name, artists),
 	}
 
 	prettyJSON, err := json.MarshalIndent(simplified, "", "  ")
