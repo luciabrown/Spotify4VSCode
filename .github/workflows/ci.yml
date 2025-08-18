@@ -3,7 +3,7 @@ name: CI Workflow
 on:
   push:
     branches:
-      - issue-13-dockerise-frontend
+      - main
 
 jobs:
   docker:

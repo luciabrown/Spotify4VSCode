@@ -19,7 +19,6 @@ code .
 
 If the pause/play functionality does not work, delete token.json and run the application again
 
-
 ------------------ DOCKER -------------------------------
 Docker build: docker build -t luciafbrown/project-full:latest -f docker/Dockerfile .
 Docker push: docker push luciafbrown/project-full:latest
