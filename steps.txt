@@ -24,13 +24,17 @@ If the pause/play functionality does not work, delete token.json and run the app
 Docker build: docker build -t luciafbrown/project-full:latest -f docker/Dockerfile .
 Dev build: docker build -t luciafbrown/project-full-dev:latest -f docker/Dockerfile.dev .
 Dev run: docker run -it -p 12345:12345 project-full-dev
+docker run -it --name dev-container -p 12345:12345 -v C:\Users\lucia\Downloads\ProjectAug25\frontend\src:/extension project-full-dev
+
 Docker push: docker push luciafbrown/project-full:latest
+Dev push: docker push luciafbrown/project-full-dev:latest
 Use baked-in .env (CI secrets):
 docker run --name project-full -p 12345:12345 luciafbrown/project-full:latest
 or
 Use local .env file at runtime
 docker run --name project-full -p 12345:12345 --env-file ./backend/.env luciafbrown/project-full:latest
 docker start -ai project-full
+docker start -ai dev-container
 
 --------------- DEV CONTAINER ----------------------
 ctrl + shift + p

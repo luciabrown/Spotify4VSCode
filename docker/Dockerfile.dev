@@ -1,7 +1,15 @@
 # DEVELOPER VIEW SO I CAN GET INTO VSCODE EXTENSION DEVELOPMENT HOST USING MY IMAGES
 FROM node:20-alpine
+
 WORKDIR /extension
+
+RUN apk add --no-cache bash dos2unix
+
 COPY ../frontend/package*.json ./
+RUN dos2unix package*.json || true
 RUN npm install
+
 COPY ../frontend ./
-CMD npm run dev
+RUN dos2unix package*.json || true
+
+CMD ["npm", "run", "dev"]
