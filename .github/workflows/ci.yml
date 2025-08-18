@@ -3,7 +3,7 @@ name: CI Workflow
 on:
   push:
     branches:
-      - main
+      - issue-13-dockerise-frontend
 
 jobs:
   docker:
@@ -30,6 +30,14 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install --prefer-offline --no-audit --progress=false
+
+      - name: Test Frontend Build
+        working-directory: frontend
+        run: npm run compile
 
       - name: Build and Push Docker image
         uses: docker/build-push-action@v5
