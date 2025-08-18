@@ -1,10 +1,6 @@
 {
   "name": "Project Full Dev Container",
   "image": "luciafbrown/project-full:latest",
-  "features": {
-    "node": "20"
-  },
- // "context": "../..",
   "workspaceFolder": "/app",
   "postStartCommand": "/app/project-full &",
   "remoteUser": "root",
@@ -13,10 +9,9 @@
     "ms-vscode.vscode-typescript-tslint-plugin"
   ],
   "mounts": [
-  "source=${localEnv:.env},target=/app/.env,type=bind,consistency=cached"
-],
+    "source=${localWorkspaceFolder}/../backend/.env,target=/app/.env,type=bind,consistency=cached"
+  ],
   "settings": {
     "terminal.integrated.shell.linux": "/bin/sh"
   }
-  
-} 
+}
