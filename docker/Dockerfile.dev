@@ -1,0 +1,7 @@
+# DEVELOPER VIEW SO I CAN GET INTO VSCODE EXTENSION DEVELOPMENT HOST USING MY IMAGES
+FROM node:20-alpine
+WORKDIR /extension
+COPY ../frontend/package*.json ./
+RUN npm install
+COPY ../frontend ./
+CMD npm run dev
