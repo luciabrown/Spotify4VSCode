@@ -14,7 +14,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /app/project-full ./backend/main.go
 # ---------- Extension Builder stage ----------
 FROM node:20-alpine AS frontend-builder
 
-WORKDIR /extension
+WORKDIR /frontend
 
 # Copy extension sources
 COPY ../frontend/package*.json ./
@@ -34,7 +34,7 @@ ARG CLIENT_SECRET
 ARG REDIRECT_URI
 
 COPY --from=backend-builder /app/project-full ./project-full
-COPY --from=frontend-builder /extension/dist ./extension
+COPY --from=frontend-builder /frontend/dist ./extension
 
 # GET INTO FROM .ENV
 RUN echo "CLIENT_ID=$CLIENT_ID" > .env \
