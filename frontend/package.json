@@ -1,46 +1,45 @@
 {
-  "name": "frontend",
+  "name": "Spotify4VSCode",
   "displayName": "SpotifyNowListening",
-  "description": "An extension to see Now Listening on Spotify",
+  "description": "An extension to see Spotify from VSCode",
+  "publisher": "LuciaBrown17",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.102.0"
   },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "*"
-  ],
+  "categories": ["Other"],
+  "activationEvents": ["*"],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
-      {
-        "command": "frontend.spotifyPlayPause",
-        "title": "Spotify: PlayPause"
-      },
-      {
-        "command": "frontend.spotifyPrev",
-        "title": "Spotify: Prev"
-      },
-      {
-        "command": "frontend.spotifyNext",
-        "title": "Spotify: Next"
-      }
+      { "command": "Spotify4VSCode.spotifyPlayPause", "title": "Spotify: PlayPause" },
+      { "command": "Spotify4VSCode.spotifyPrev", "title": "Spotify: Prev" },
+      { "command": "Spotify4VSCode.spotifyNext", "title": "Spotify: Next" }
     ]
   },
+  "repository": {
+  "type": "git",
+  "url": "https://github.com/luciabrown/Spotify4VSCode.git"
+  },
   "scripts": {
-    "vscode:prepublish": "npm run package",
-    "compile": "webpack",
-    "dev": "npm run watch",
-    "watch": "webpack --watch",
+    "vscode:prepublish": "node ./scripts/build-backend.mjs && npm run package",
     "package": "webpack --mode production --devtool hidden-source-map",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "dev": "npm run watch",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src",
     "test": "vscode-test"
   },
+  "files": [
+    "dist/**",
+    "out/bin/**",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",

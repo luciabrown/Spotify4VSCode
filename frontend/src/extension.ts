@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import * as cp from 'child_process';
+import * as path from 'path';
 
 interface SpotifyNowPlaying {
   status: 'Playing' | 'Paused';
@@ -12,14 +14,37 @@ interface SpotifyNowPlaying {
 
 export function activate(context: vscode.ExtensionContext) {
 
+    const platform = process.platform;
+    const arch = process.arch;
+
+    const baseName =
+        platform === 'win32'
+            ? `backend-${platform}-${arch}.exe`
+            : `backend-${platform}-${arch}`;
+
+
+    const backendPath = context.asAbsolutePath(path.join('out', 'bin', baseName));
+    const backend = cp.spawn(backendPath, [], {
+        cwd: path.dirname(backendPath),
+        windowsHide: true
+    });
+    backend.stdout.on('data', d => console.log(`backend: ${d}`));
+    backend.stderr.on('data', d => console.error(`backend error: ${d}`));
+    backend.on('close', code => console.log(`backend exited: ${code}`));
+    vscode.window.showInformationMessage('Go backend started');
+
     const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
-	const disposable = vscode.commands.registerCommand('frontend.helloWorld', () => {
+	const disposable = vscode.commands.registerCommand('Spotify4VSCode.helloWorld', () => {
 		vscode.window.showInformationMessage('Hello World from SpotifyNowListening!');
 	});
-	context.subscriptions.push(disposable);
+	context.subscriptions.push(
+        new vscode.Disposable(() => {
+            try { backend.kill(); } catch {}
+        })
+    );
 
     // Play command
-    const playCmd = vscode.commands.registerCommand('frontend.spotifyPlayPause', async () => {
+    const playCmd = vscode.commands.registerCommand('Spotify4VSCode.spotifyPlayPause', async () => {
         try {
             const res = await fetch('http://127.0.0.1:12345/playpause', { method: 'PUT' });
             const text = await res.text();
@@ -31,7 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(playCmd);
     
     // Prev command
-    const prevCmd = vscode.commands.registerCommand('frontend.spotifyPrev', async () => {
+    const prevCmd = vscode.commands.registerCommand('Spotify4VSCode.spotifyPrev', async () => {
         try {
             stopPolling();
             const res = await fetch('http://127.0.0.1:12345/prev', { method: 'POST' });
@@ -48,7 +73,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(prevCmd);
 
     // Next command
-    const nextCmd = vscode.commands.registerCommand('frontend.spotifyNext', async () => {
+    const nextCmd = vscode.commands.registerCommand('Spotify4VSCode.spotifyNext', async () => {
         try {
             stopPolling();
             const res = await fetch('http://127.0.0.1:12345/next', { method: 'POST' });
@@ -74,7 +99,7 @@ export function activate(context: vscode.ExtensionContext) {
     const playButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 99);
     playButton.text = '$(play-circle)';
     playButton.tooltip = 'PlayPause Spotify';
-    playButton.command = 'frontend.spotifyPlayPause';
+    playButton.command = 'Spotify4VSCode.spotifyPlayPause';
     playButton.show();
     context.subscriptions.push(playButton);
 
@@ -82,7 +107,7 @@ export function activate(context: vscode.ExtensionContext) {
     const prevButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 98);
     prevButton.text = '$(debug-reverse-continue)';
     prevButton.tooltip = 'Previous Spotify';
-    prevButton.command = 'frontend.spotifyPrev';
+    prevButton.command = 'Spotify4VSCode.spotifyPrev';
     prevButton.show();
     context.subscriptions.push(prevButton);
 
@@ -90,7 +115,7 @@ export function activate(context: vscode.ExtensionContext) {
     const nextButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 97);
     nextButton.text =  '$(debug-continue)';
     nextButton.tooltip = 'Next Spotify';
-    nextButton.command = 'frontend.spotifyNext';
+    nextButton.command = 'Spotify4VSCode.spotifyNext';
     nextButton.show();
     context.subscriptions.push(nextButton);
 
@@ -134,6 +159,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     updateSpotifyStatus();
     startPolling();
+    
 }
 
 export function deactivate() {}
