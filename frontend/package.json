@@ -11,7 +11,7 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+    "onCommand:Spotify4VSCode.spotifyPlayPause"
   ],
   "main": "./dist/extension.js",
   "contributes": {
