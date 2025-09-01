@@ -5,6 +5,7 @@
 			"name": "Run Extension",
 			"type": "extensionHost",
 			"request": "launch",
+			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}"
 			],
@@ -14,7 +15,7 @@
 			"outFiles": [
 				"${workspaceFolder}/dist/**/*.js"
 			],
-			"preLaunchTask": "${defaultBuildTask}"
+			"preLaunchTask": "compile-frontend-backend"
 		}
 	]
 }
