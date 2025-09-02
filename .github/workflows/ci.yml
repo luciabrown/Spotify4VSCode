@@ -3,7 +3,7 @@ name: CI Workflow
 on:
   push:
     branches:
-      - 26-update-github-ci-pipeline-with-new-updates-packaging-publishing
+      - main
 
 jobs:
   # Backend Build
