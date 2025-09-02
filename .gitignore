@@ -4,5 +4,5 @@ frontend/node_modules
 backend/.env
 backend/token.json
 */token.json
-frontend/dist/extension.js
-frontend/dist/extension.js.map
+frontend/out/*
+frontend/dist/*

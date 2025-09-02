@@ -1,57 +1,63 @@
 {
-  "name": "frontend",
-  "displayName": "SpotifyNowListening",
-  "description": "An extension to see Now Listening on Spotify",
-  "version": "0.0.1",
+  "name": "spotify4vsco8de",
+  "displayName": "Spotify4VSCode",
+  "description": "An extension to see Spotify from VSCode",
+  "publisher": "LuciaBrown17",
+  "version": "0.0.3",
   "engines": {
     "vscode": "^1.102.0"
   },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "*"
-  ],
-  "main": "./dist/extension.js",
+  "categories": ["Other"],
+  "main": "./out/extension.js",
+  "activationEvents": ["*"],
   "contributes": {
     "commands": [
       {
-        "command": "frontend.spotifyPlayPause",
+        "command": "Spotify4VSCode.spotifyPlayPause",
         "title": "Spotify: PlayPause"
       },
       {
-        "command": "frontend.spotifyPrev",
+        "command": "Spotify4VSCode.spotifyPrev",
         "title": "Spotify: Prev"
       },
       {
-        "command": "frontend.spotifyNext",
+        "command": "Spotify4VSCode.spotifyNext",
         "title": "Spotify: Next"
       }
     ]
   },
-  "scripts": {
-    "vscode:prepublish": "npm run package",
-    "compile": "webpack",
-    "watch": "webpack --watch",
-    "package": "webpack --mode production --devtool hidden-source-map",
-    "compile-tests": "tsc -p . --outDir out",
-    "watch-tests": "tsc -p . -w --outDir out",
-    "pretest": "npm run compile-tests && npm run compile && npm run lint",
-    "lint": "eslint src",
-    "test": "vscode-test"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/luciabrown/Spotify4VSCode.git"
   },
-  "devDependencies": {
-    "@types/mocha": "^10.0.10",
-    "@types/node": "20.x",
-    "@types/vscode": "^1.102.0",
-    "@typescript-eslint/eslint-plugin": "^8.31.1",
-    "@typescript-eslint/parser": "^8.31.1",
-    "@vscode/test-cli": "^0.0.11",
-    "@vscode/test-electron": "^2.5.2",
-    "eslint": "^9.25.1",
-    "ts-loader": "^9.5.2",
-    "typescript": "^5.9.2",
-    "webpack": "^5.101.0",
-    "webpack-cli": "^6.0.1"
-  }
+  "scripts": {
+      "compile": "tsc -p .",
+      "watch": "tsc -p . -w",
+      "dev": "npm run watch",
+      "build-backend": "node ./scripts/build-backend.mjs",
+      "vscode:prepublish": "npm run build-backend && npm run compile",
+      "pretest": "npm run compile && npm run lint",
+      "lint": "eslint src",
+      "test": "vscode-test"
+    },
+
+    "files": [
+      "out/**",
+      "out/bin/**",
+      "package.json",
+      "README.md",
+      "LICENSE"
+    ],
+
+    "devDependencies": {
+      "@types/mocha": "^10.0.10",
+      "@types/node": "20.x",
+      "@types/vscode": "^1.102.0",
+      "@typescript-eslint/eslint-plugin": "^8.31.1",
+      "@typescript-eslint/parser": "^8.31.1",
+      "@vscode/test-cli": "^0.0.11",
+      "@vscode/test-electron": "^2.5.2",
+      "eslint": "^9.25.1",
+      "typescript": "^5.9.2"
+    }
 }

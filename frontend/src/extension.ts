@@ -1,139 +1,183 @@
 import * as vscode from 'vscode';
+import * as cp from 'child_process';
+import * as path from 'path';
 
 interface SpotifyNowPlaying {
-  status: 'Playing' | 'Paused';
-  song?: string;
-  artists?: string;
-  album?: string;
-  album_art_url?: string;
-  spotify_url?: string;
-  description?: string;
+    status: 'Playing' | 'Paused';
+    song?: string;
+    artists?: string;
+    album?: string;
+    album_art_url?: string;
+    spotify_url?: string;
+    description?: string;
 }
 
-export function activate(context: vscode.ExtensionContext) {
+const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
 
-    const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
-	const disposable = vscode.commands.registerCommand('frontend.helloWorld', () => {
-		vscode.window.showInformationMessage('Hello World from SpotifyNowListening!');
-	});
-	context.subscriptions.push(disposable);
+function getBackendBinary(platform: NodeJS.Platform, arch: string): string {
+    let goos: string;
+    let goarch: string;
 
-    // Play command
-    const playCmd = vscode.commands.registerCommand('frontend.spotifyPlayPause', async () => {
-        try {
-            const res = await fetch('http://127.0.0.1:12345/playpause', { method: 'PUT' });
-            const text = await res.text();
-            vscode.window.showInformationMessage(`Play: ${text}`);
-        } catch (err) {
-            vscode.window.showErrorMessage(`Play error: ${err}`);
+    if (platform === "darwin") goos = "darwin";
+    else if (platform === "linux") goos = "linux";
+    else if (platform === "win32") goos = "windows";
+    else throw new Error(`Unsupported platform: ${platform}`);
+
+    if (arch === "x64") goarch = "amd64";
+    else if (arch === "arm64") goarch = "arm64";
+    else throw new Error(`Unsupported arch: ${arch}`);
+
+    return `backend-${goos}-${goarch}${goos === "windows" ? ".exe" : ""}`;
+}
+
+export async function activate(context: vscode.ExtensionContext) {
+    const binName = getBackendBinary(process.platform, process.arch);
+    const backendPath = context.asAbsolutePath(path.join('out', 'bin', binName));
+
+    // Spawn backend
+    const backend = cp.spawn(backendPath, [], { cwd: path.dirname(backendPath), windowsHide: false });
+    backend.stdout.on('data', d => console.log(`backend: ${d}`));
+    backend.stderr.on('data', d => console.error(`backend error: ${d}`));
+    backend.on('close', code => console.log(`backend exited: ${code}`));
+
+    context.subscriptions.push(new vscode.Disposable(() => { try { backend.kill(); } catch {} }));
+
+    // Wait for backend to start
+    async function waitForBackendReady(timeoutMs = 15000) {
+        const url = 'http://127.0.0.1:12345/nowplaying';
+        const deadline = Date.now() + timeoutMs;
+        while (Date.now() < deadline) {
+            try {
+                const res = await fetch(url);
+                if (res.ok || res.status === 401) return true;
+            } catch {
+                await delay(500);
+            }
         }
-    });
-    context.subscriptions.push(playCmd);
-    
-    // Prev command
-    const prevCmd = vscode.commands.registerCommand('frontend.spotifyPrev', async () => {
-        try {
-            stopPolling();
-            const res = await fetch('http://127.0.0.1:12345/prev', { method: 'POST' });
-            const text = await res.text();
-            vscode.window.showInformationMessage(`Prev: ${text}`);
-            await delay(300); // give Spotify time to switch tracks
-            updateSpotifyStatus(); //show new track
-            startPolling();
-        } catch (err) {
-            vscode.window.showErrorMessage(`Prev error: ${err}`);
-            startPolling();
-        }
-    });
-    context.subscriptions.push(prevCmd);
+        vscode.window.showErrorMessage('Backend failed to start. Check backend logs.');
+        return false;
+    }
+    if (!(await waitForBackendReady())) return;
 
-    // Next command
-    const nextCmd = vscode.commands.registerCommand('frontend.spotifyNext', async () => {
-        try {
-            stopPolling();
-            const res = await fetch('http://127.0.0.1:12345/next', { method: 'POST' });
-            const text = await res.text();
-            vscode.window.showInformationMessage(`Next: ${text}`);
-            await delay(400); // give Spotify time to switch tracks
-            updateSpotifyStatus();
-            startPolling();
-        } catch (err) {
-            updateSpotifyStatus(); //show new track
-            startPolling();
-        }
-    });
-    context.subscriptions.push(nextCmd);
-
-    // Status Bar: Song
+    // Status bar items
     const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
     statusBarItem.text = '$(sync~spin) Fetching Spotify...';
     statusBarItem.show();
     context.subscriptions.push(statusBarItem);
 
-    // Status Bar: Play/Pause Button
     const playButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 99);
     playButton.text = '$(play-circle)';
-    playButton.tooltip = 'PlayPause Spotify';
-    playButton.command = 'frontend.spotifyPlayPause';
+    playButton.tooltip = 'Play/Pause Spotify';
+    playButton.command = 'Spotify4VSCode.spotifyPlayPause';
     playButton.show();
     context.subscriptions.push(playButton);
 
-    // Status Bar: Prev Button
     const prevButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 98);
     prevButton.text = '$(debug-reverse-continue)';
     prevButton.tooltip = 'Previous Spotify';
-    prevButton.command = 'frontend.spotifyPrev';
+    prevButton.command = 'Spotify4VSCode.spotifyPrev';
     prevButton.show();
     context.subscriptions.push(prevButton);
 
-    // Status Bar: Next Button
     const nextButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 97);
-    nextButton.text =  '$(debug-continue)';
+    nextButton.text = '$(debug-continue)';
     nextButton.tooltip = 'Next Spotify';
-    nextButton.command = 'frontend.spotifyNext';
+    nextButton.command = 'Spotify4VSCode.spotifyNext';
     nextButton.show();
     context.subscriptions.push(nextButton);
 
+    // Polling
     let pollInterval: NodeJS.Timeout | undefined;
-
-    // Poll control
     function startPolling() {
         stopPolling();
         pollInterval = setInterval(updateSpotifyStatus, 15000);
     }
-
     function stopPolling() {
-        if (pollInterval) {
-            clearInterval(pollInterval);
-            pollInterval = undefined;
+        if (pollInterval) { clearInterval(pollInterval); pollInterval = undefined; }
+    }
+
+    // Auth prompt
+    const authOk = await checkSpotifyAuthOnce();
+
+    async function checkSpotifyAuthOnce(): Promise<boolean> {
+        try {
+            const res = await fetch('http://127.0.0.1:12345/nowplaying');
+            const text = await res.text();
+            if (!res.ok || text.toLowerCase().includes('unauthorized') || text.toLowerCase().includes('no token')) {
+                const confirm = await vscode.window.showInformationMessage(
+                    'Spotify authorization is required. Open browser to authenticate?',
+                    'Yes', 'No'
+                );
+                if (confirm === 'Yes') {
+                    try {
+                        // 🔑 Ask backend for the actual login URL
+                        const loginRes = await fetch('http://127.0.0.1:12345/login');
+                        const url = await loginRes.text();
+                        vscode.env.openExternal(vscode.Uri.parse(url.trim()));
+                        vscode.window.showInformationMessage('After login, return to VSCode and your session will activate.');
+                    } catch (err) {
+                        vscode.window.showErrorMessage(`Failed to fetch login URL: ${err}`);
+                    }
+                }
+                return false;
+            }
+            return true;
+        } catch {
+            return false;
         }
     }
 
-	// Poll spotify
-	async function updateSpotifyStatus() {
-		try {
-			const res = await fetch('http://127.0.0.1:12345/nowplaying');
-			if (!res.ok) {
-				statusBarItem.text = '$(error) Spotify fetch error';
-				return;
-			}
-			const data = (await res.json()) as SpotifyNowPlaying;
-			console.log('Spotify fetch data:', data);
+    async function updateSpotifyStatus() {
+        try {
+            const res = await fetch('http://127.0.0.1:12345/nowplaying');
+            const text = await res.text();
+            const data = JSON.parse(text) as SpotifyNowPlaying;
 
-			if (data.status === 'Paused') {
-			statusBarItem.text = '$(debug-pause) Not playing';
-			} else if (data.song) {
-			statusBarItem.text = `$(play) ${data.song} — ${data.artists}`;
-			} else {
-			statusBarItem.text = '$(question) No song data';
-			}
-		} catch (error) {
-			statusBarItem.text = '$(error) Failed to fetch Spotify';
-		}
-	}
+            if (data.status === 'Paused') statusBarItem.text = '$(debug-pause) Not playing';
+            else if (data.song) statusBarItem.text = `$(play) ${data.song} — ${data.artists}`;
+            else statusBarItem.text = '$(question) No song data';
+        } catch {
+            statusBarItem.text = authOk ? '$(error) Failed to fetch Spotify' : '$(error) Spotify auth required';
+        }
+    }
+
+    // Commands
+    const playCmd = vscode.commands.registerCommand('Spotify4VSCode.spotifyPlayPause', async () => {
+        try {
+            const res = await fetch('http://127.0.0.1:12345/playpause', { method: 'PUT' });
+            const text = await res.text();
+            vscode.window.showInformationMessage(`Play: ${text}`);
+        } catch (err) { vscode.window.showErrorMessage(`Play error: ${err}`); }
+    });
+    context.subscriptions.push(playCmd);
+
+    const prevCmd = vscode.commands.registerCommand('Spotify4VSCode.spotifyPrev', async () => {
+        try {
+            stopPolling();
+            const res = await fetch('http://127.0.0.1:12345/prev', { method: 'POST' });
+            const text = await res.text();
+            vscode.window.showInformationMessage(`Prev: ${text}`);
+            await delay(300);
+            updateSpotifyStatus();
+            startPolling();
+        } catch (err) { vscode.window.showErrorMessage(`Prev error: ${err}`); startPolling(); }
+    });
+    context.subscriptions.push(prevCmd);
+
+    const nextCmd = vscode.commands.registerCommand('Spotify4VSCode.spotifyNext', async () => {
+        try {
+            stopPolling();
+            const res = await fetch('http://127.0.0.1:12345/next', { method: 'POST' });
+            const text = await res.text();
+            vscode.window.showInformationMessage(`Next: ${text}`);
+            await delay(400);
+            updateSpotifyStatus();
+            startPolling();
+        } catch { updateSpotifyStatus(); startPolling(); }
+    });
+    context.subscriptions.push(nextCmd);
 
     updateSpotifyStatus();
     startPolling();
 }
-
 export function deactivate() {}
