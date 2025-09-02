@@ -5,10 +5,9 @@
       "name": "Run Extension",
       "type": "extensionHost",
       "request": "launch",
-      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
-      "runtimeArgs": ["--disable-extensions"],
-      "outFiles": ["${workspaceFolder}/dist/**/*.js"],
-      "preLaunchTask": "compile-frontend-backend"
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],  
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+  //  "preLaunchTask": "compile-frontend-backend"
     }
   ]
 }
