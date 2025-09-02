@@ -14,11 +14,25 @@ interface SpotifyNowPlaying {
 
 const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
 
+function getBackendBinary(platform: NodeJS.Platform, arch: string): string {
+    let goos: string;
+    let goarch: string;
+
+    if (platform === "darwin") goos = "darwin";
+    else if (platform === "linux") goos = "linux";
+    else if (platform === "win32") goos = "windows";
+    else throw new Error(`Unsupported platform: ${platform}`);
+
+    if (arch === "x64") goarch = "amd64";
+    else if (arch === "arm64") goarch = "arm64";
+    else throw new Error(`Unsupported arch: ${arch}`);
+
+    return `backend-${goos}-${goarch}${goos === "windows" ? ".exe" : ""}`;
+}
+
 export async function activate(context: vscode.ExtensionContext) {
-    const platform = process.platform;
-    const arch = process.arch;
-    const baseName = platform === 'win32' ? `backend-${platform}-${arch}.exe` : `backend-${platform}-${arch}`;
-    const backendPath = context.asAbsolutePath(path.join('out', 'bin', baseName));
+    const binName = getBackendBinary(process.platform, process.arch);
+    const backendPath = context.asAbsolutePath(path.join('out', 'bin', binName));
 
     // Spawn backend
     const backend = cp.spawn(backendPath, [], { cwd: path.dirname(backendPath), windowsHide: false });
@@ -43,8 +57,7 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.window.showErrorMessage('Backend failed to start. Check backend logs.');
         return false;
     }
-
-    await waitForBackendReady();
+    if (!(await waitForBackendReady())) return;
 
     // Status bar items
     const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
@@ -96,9 +109,15 @@ export async function activate(context: vscode.ExtensionContext) {
                     'Yes', 'No'
                 );
                 if (confirm === 'Yes') {
-                    // BROKEN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    vscode.env.openExternal(vscode.Uri.parse('https://accounts.spotify.com/authorize?access_type=offline&client_id=...&redirect_uri=...&response_type=code&scope=...'));
-                    vscode.window.showInformationMessage('After login, wait a few seconds and refresh manually.');
+                    try {
+                        // 🔑 Ask backend for the actual login URL
+                        const loginRes = await fetch('http://127.0.0.1:12345/login');
+                        const url = await loginRes.text();
+                        vscode.env.openExternal(vscode.Uri.parse(url.trim()));
+                        vscode.window.showInformationMessage('After login, return to VSCode and your session will activate.');
+                    } catch (err) {
+                        vscode.window.showErrorMessage(`Failed to fetch login URL: ${err}`);
+                    }
                 }
                 return false;
             }
@@ -161,5 +180,4 @@ export async function activate(context: vscode.ExtensionContext) {
     updateSpotifyStatus();
     startPolling();
 }
-
 export function deactivate() {}

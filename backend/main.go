@@ -32,6 +32,8 @@ func main() {
 		fmt.Fprintf(w, "backend running")
 	})
 
+	http.HandleFunc("/login", handlers.LoginHandler)
+
 	http.HandleFunc("/callback", handlers.HandleCallback)
 	http.HandleFunc("/nowplaying", handlers.NowPlayingHandler) // Start the handler to find song
 	//http.HandleFunc("/coverart", handlers.CoverArtHandler)     // Get cover art
