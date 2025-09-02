@@ -57,7 +57,7 @@ jobs:
       - name: Publish VSCode Extension
         if: github.ref == 'refs/heads/main'
         working-directory: frontend
-        run: npx vsce publish
+        run: npx vsce publish patch
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
 
