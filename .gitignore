@@ -6,3 +6,4 @@ backend/token.json
 */token.json
 frontend/out/*
 frontend/dist/*
+steps.txt
