@@ -7,3 +7,4 @@ backend/token.json
 frontend/out/*
 frontend/dist/*
 steps.txt
+*.txt
