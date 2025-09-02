@@ -1,15 +1,19 @@
 {
-  "name": "spotify4vsco8de",
+  "name": "spotify4vscode",
   "displayName": "Spotify4VSCode",
   "description": "An extension to see Spotify from VSCode",
   "publisher": "LuciaBrown17",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "engines": {
     "vscode": "^1.102.0"
   },
-  "categories": ["Other"],
+  "categories": [
+    "Other"
+  ],
   "main": "./out/extension.js",
-  "activationEvents": ["*"],
+  "activationEvents": [
+    "*"
+  ],
   "contributes": {
     "commands": [
       {
@@ -31,33 +35,31 @@
     "url": "https://github.com/luciabrown/Spotify4VSCode.git"
   },
   "scripts": {
-      "compile": "tsc -p .",
-      "watch": "tsc -p . -w",
-      "dev": "npm run watch",
-      "build-backend": "node ./scripts/build-backend.mjs",
-      "vscode:prepublish": "npm run build-backend && npm run compile",
-      "pretest": "npm run compile && npm run lint",
-      "lint": "eslint src",
-      "test": "vscode-test"
-    },
-
-    "files": [
-      "out/**",
-      "out/bin/**",
-      "package.json",
-      "README.md",
-      "LICENSE"
-    ],
-
-    "devDependencies": {
-      "@types/mocha": "^10.0.10",
-      "@types/node": "20.x",
-      "@types/vscode": "^1.102.0",
-      "@typescript-eslint/eslint-plugin": "^8.31.1",
-      "@typescript-eslint/parser": "^8.31.1",
-      "@vscode/test-cli": "^0.0.11",
-      "@vscode/test-electron": "^2.5.2",
-      "eslint": "^9.25.1",
-      "typescript": "^5.9.2"
-    }
+    "compile": "tsc -p .",
+    "watch": "tsc -p . -w",
+    "dev": "npm run watch",
+    "build-backend": "node ./scripts/build-backend.mjs",
+    "vscode:prepublish": "npm run build-backend && npm run compile",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "files": [
+    "out/**",
+    "out/bin/**",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.102.0",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.25.1",
+    "typescript": "^5.9.2"
+  }
 }
