@@ -6,4 +6,4 @@
 
 #### I didn't realise a better version of this already exists on VSCode :deaf_woman::disappointed_relieved:
 
-####### Note to self: always update package.json with incremented number when making changes to main
+###### Note to self: always update package.json with incremented number when making changes to main
