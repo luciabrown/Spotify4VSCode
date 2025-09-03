@@ -36,6 +36,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Write backend .env file
+        run: |
+          echo "CLIENT_ID=${{ secrets.CLIENT_ID }}" >> backend/.env
+          echo "CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}" >> backend/.env
+          echo "REDIRECT_URI=${{ secrets.REDIRECT_URI }}" >> backend/.env
+
       - name: Download backend binaries
         uses: actions/download-artifact@v4
         with:
