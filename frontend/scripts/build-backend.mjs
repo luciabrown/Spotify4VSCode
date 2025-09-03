@@ -1,9 +1,6 @@
-import { mkdirSync } from 'fs';
+import { mkdirSync, copyFileSync, existsSync } from 'fs';
 import { spawn } from 'child_process';
 import { join } from 'path';
-import { copyFileSync } from 'fs';
-
-copyFileSync(join(backendDir, '.env'), join(outDir, '.env')); // load env file into Go binary
 
 const targets = [
   { GOOS: 'darwin',  GOARCH: 'arm64' },
@@ -14,9 +11,9 @@ const targets = [
   { GOOS: 'windows', GOARCH: 'amd64' },
 ];
 
-const root = join(process.cwd(), '..');          // .../root/frontend -> .. = root
+const root = join(process.cwd(), '..');             // .../frontend -> ..
 const backendDir = join(root, 'backend');
-const outDir = join(process.cwd(), 'out', 'bin'); // .../frontend/out/bin
+const outDir = join(process.cwd(), 'out', 'bin');   // .../frontend/out/bin
 
 mkdirSync(outDir, { recursive: true });
 
@@ -26,7 +23,7 @@ function buildOne({ GOOS, GOARCH }) {
     const outName = `backend-${GOOS}-${GOARCH}${isWin ? '.exe' : ''}`;
     const outPath = join(outDir, outName);
 
-    const env = { ...process.env, GOOS, GOARCH, CGO_ENABLED: '0' }; // cross-compile
+    const env = { ...process.env, GOOS, GOARCH, CGO_ENABLED: '0' };
 
     const proc = spawn('go', ['build', '-o', outPath, '.'], {
       cwd: backendDir,
@@ -43,6 +40,13 @@ function buildOne({ GOOS, GOARCH }) {
 
 for (const t of targets) {
   await buildOne(t);
+}
+
+// Copy .env only if it exists (local dev)
+const localEnv = join(backendDir, '.env');
+if (existsSync(localEnv)) {
+  copyFileSync(localEnv, join(outDir, '.env'));
+  console.log('Copied local .env into out/bin (dev mode)');
 }
 
 console.log('Built backend binaries into out/bin');
