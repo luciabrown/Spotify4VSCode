@@ -19,8 +19,8 @@ func main() {
 	clientSecret := os.Getenv("CLIENT_SECRET")
 	redirectURI := os.Getenv("REDIRECT_URI")
 
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	if err != nil { // Continue (not fatal) if .env not found
+		log.Println("No .env file found, relying on system environment variables.")
 	}
 
 	handlers.SetOAuthConfig(clientID, clientSecret, redirectURI)
