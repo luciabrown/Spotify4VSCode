@@ -4,8 +4,6 @@
 
 ### The extension is available for download here ➡️: https://marketplace.visualstudio.com/items?itemName=LuciaBrown17.Spotify4VSCode&ssr=false#overview
 
-### Currently in the "it works on my machine" phase but I will test on other devices 😆
+#### I didn't realise a better version of this already exists on VSCode :deaf_woman::disappointed_relieved:
 
-### I'm also going to close all issues & fix CI pipeline before finishing up this project! 🙌
-
-###### Note to self: always update package.json with incremented number when making changes to main
+####### Note to self: always update package.json with incremented number when making changes to main
