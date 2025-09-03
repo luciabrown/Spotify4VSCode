@@ -3,7 +3,7 @@
   "displayName": "Spotify4VSCode",
   "description": "An extension to see Spotify from VSCode",
   "publisher": "LuciaBrown17",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.102.0"
   },
