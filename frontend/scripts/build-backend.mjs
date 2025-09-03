@@ -1,6 +1,9 @@
 import { mkdirSync } from 'fs';
 import { spawn } from 'child_process';
 import { join } from 'path';
+import { copyFileSync } from 'fs';
+
+copyFileSync(join(backendDir, '.env'), join(outDir, '.env')); // load env file into Go binary
 
 const targets = [
   { GOOS: 'darwin',  GOARCH: 'arm64' },
